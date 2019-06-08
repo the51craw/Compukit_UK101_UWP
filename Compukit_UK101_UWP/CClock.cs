@@ -16,18 +16,18 @@ namespace Compukit_UK101_UWP
             this.mainPage = mainPage;
             Timer = new DispatcherTimer();
             Timer.Interval = new TimeSpan(0, 0, 0, 0, 1); // 1 ms
-            //Timer.Interval = new TimeSpan(1000); // 10 us
+            //Timer.Interval = new TimeSpan(100); // 10 us
             Timer.Tick += Timer_Tick;
             cycles = 0;
         }
 
         private void Timer_Tick(object sender, object e)
         {
-            while (cycles < 1000)
+            while (cycles < 20000)
             {
                 cycles += mainPage.CSignetic6502.SingleStep();
             }
-            cycles -= 1000;
+            cycles -= 20000;
         }
     }
 }

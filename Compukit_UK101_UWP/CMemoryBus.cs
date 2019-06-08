@@ -7,6 +7,7 @@ namespace Compukit_UK101_UWP
     public class CMemoryBus
     {
         public const Int32 DEVICES_MAX = 9;
+        public byte DeviceIndex;
         public CMemoryBusDevice[] Device = new CMemoryBusDevice[DEVICES_MAX];
         public Address Address { get; set; }
         int selectedDevice;
@@ -106,19 +107,61 @@ namespace Compukit_UK101_UWP
         public void SetAddress(Address address)
         {
             Address = new Address(address);
-            for (Int32 i = 0; i < DEVICES_MAX; i++)
+            DeviceIndex = AddressToDeviceindex(Address);
+            Device[DeviceIndex].SetAddress(Address);
+            //for (Int32 i = 0; i < DEVICES_MAX; i++)
+            //{
+            //    Device[i].SetAddress(Address);
+            //}
+        }
+
+        private byte AddressToDeviceindex(Address address)
+        {
+            if (Address.W >= 0xf800)
             {
-                Device[i].SetAddress(Address);
+                return 4;
+            }
+            else if (Address.W >= 0xdf00)
+            {
+                return 6;
+            }
+            else if (Address.W >= 0xd000)
+            {
+                return 7;
+            }
+            else if (Address.W >= 0xb800)
+            {
+                return 3;
+            }
+            else if (Address.W >= 0xb000)
+            {
+                return 2;
+            }
+            else if (Address.W >= 0xa800)
+            {
+                return 1;
+            }
+            else if (Address.W >= 0xa000)
+            {
+                return 0;
+            }
+            else if (Address.W >= 0x8000)
+            {
+                return 8;
+            }
+            else
+            {
+                return 5;
             }
         }
 
         public void Write(byte Data)
         {
-            for (Int32 i = 0; i < DEVICES_MAX; i++)
-            {
-                if (Device[i].Selected)
-                {
-                    switch (i)
+            //for (Int32 i = 0; i < DEVICES_MAX; i++)
+            //{
+            //    if (Device[i].Selected)
+            //    {
+                    switch (DeviceIndex)
                     {
                         case 0:
                             Basic1.Write(Data);
@@ -148,8 +191,8 @@ namespace Compukit_UK101_UWP
                             ROM8000.Write(Data);
                             break;
                     }
-                }
-            }
+            //    }
+            //}
         }
 
         public byte Read()
@@ -157,11 +200,11 @@ namespace Compukit_UK101_UWP
             // Unavailable address spaces return H as data in the real hardware:
             byte OutData = (byte)Address.H;
 
-            for (Int32 i = 0; i < DEVICES_MAX; i++)
-            {
-                if (Device[i].Selected)
-                {
-                    switch (i)
+            //for (Int32 i = 0; i < DEVICES_MAX; i++)
+            //{
+            //    if (Device[i].Selected)
+            //    {
+                    switch (DeviceIndex)
                     {
                         case 0:
                             OutData = Basic1.Read();
@@ -176,7 +219,8 @@ namespace Compukit_UK101_UWP
                             OutData = Basic4.Read();
                             break;
                         case 4:
-                            OutData = Monitor.pData[Address.W - Monitor.StartsAt.W];
+                            //OutData = Monitor.pData[Address.W - Monitor.StartsAt.W];
+                            OutData = Monitor.Read();
                             break;
                         case 5:
                             OutData = RAM.Read();
@@ -191,8 +235,8 @@ namespace Compukit_UK101_UWP
                             OutData = ROM8000.Read();
                             break;
                     }
-                }
-            }
+            //    }
+            //}
 
             return OutData;
         }
