@@ -1,0 +1,53 @@
+fbb2 46 LSR ZERO_PAGE fb			// This is some code/data read from fe42
+fbb4 9b???  ff						//
+fbb6 94 STY Z_PAGE_X fb				// 46 fb 9b ff  Fû›ÿ
+fbb8 70 BVS RELATIVE fe				// 64 fb 70 fe  dûpþ
+fbba 7b???  fe						// 7b fe 2f 4c  {þ/L
+fbbc 2f???  4c						// d0 4c d7 bd  
+fbbe d0 BNE RELATIVE 4c				// 8c d0 9d 8c  STA ABS,X 8c d0  DEX RTS
+fbc0 d7???  bd						// d0 ca 60 00  
+fbc2 8c STY ABSOLUTE d0 9d			// 20 8c d0 88  
+fbc5 8c STY ABSOLUTE d0 ca			// f9 ae 22     
+fbc8 60 RTS IMPLIED					// 
+fbc9 00 BRK IMPLIED					//
+fbca 20 JSR ABSOLUTE 8c d0			//
+fbcd 88 DEY IMPLIED					//
+fbce f9 SBC ABS_Y ae 22				// -----------------------------------
+fbd1 02???  38 ad 
+fbd4 2b???  02 f9 
+fbd7 23???  02 ad 
+
+
+fe40 a0 LDY IMMEDIATE 1c        // fbb2 + 1c = fbce 0218 + 1c = 0234
+fe42 b9 LDA ABS_Y b2 fb			// A = f9, 88, d0, 8c, 20, 00, 60, ca, d0, 8c, 9d, d0, 8c, bd, d7, 4c, d0, 4c, 2f, fe, 7b, fe, 70, fb, 94, ff, 9b, fb, 46
+fe45 99 STA ABS_Y 18 02			// 
+fe48 88 DEY IMPLIED				// 
+fe49 10 BPL RELATIVE f7			// 
+
+0218 46 LSR ZERO_PAGE fb
+ 9b 
+ ff  
+ 94 
+ fb 
+ 70 
+ fe 
+ 7b 
+ fe 
+ 2f 
+ 4c 
+ d0 
+ 4c 
+ d7 
+ bd 
+ 8c 
+ d0 
+ 9d STA ABS_X 8c d0
+ ca DEX IMPLIED 
+ 60 RTS IMPLIED
+ 00 
+ 20 
+ 8c 
+ d0 
+ 88 
+ f9 
+ 

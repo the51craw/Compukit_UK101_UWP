@@ -1,0 +1,41 @@
+﻿<Page
+    x:Class="Compukit_UK101_UWP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Compukit_UK101_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" KeyDown="Page_KeyDown" KeyUp="Page_KeyUp">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid  Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" x:Name="btnEmulator" Content="Emulator" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="btnEmulator_Click" PreviewKeyDown="BtnEmulator_PreviewKeyDown" PreviewKeyUp="BtnEmulator_PreviewKeyUp" />
+            <Button Grid.Column="1" x:Name="btnFile" Content="File" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="btnFile_Click" />
+            <Button Grid.Column="2" x:Name="btnHelp" Content="Help" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="Help_Click" />
+            <Button Grid.Column="3" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="License_Click" />
+        </Grid>
+        <Grid  Grid.Row="1">
+            <Grid x:Name="gridScreen" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gray" />
+        </Grid>
+        <Grid  Grid.Row="1">
+            <Grid x:Name="gridFile" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </Grid>
+        <Grid  Grid.Row="1">
+            <Grid x:Name="gridHelp" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </Grid>
+        <Grid  Grid.Row="1">
+            <Grid x:Name="gridLicense" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </Grid>
+    </Grid>
+</Page>

@@ -1,0 +1,944 @@
+f800 a5 LDA ZERO_PAGE 0e 
+f802 f0 BEQ RELATIVE 06 
+f804 c6 DEC ZERO_PAGE 0e 
+f806 f0 BEQ RELATIVE 02 
+f808 c6 DEC ZERO_PAGE 0e 
+f80a a9 LDA IMMEDIATE 20 
+f80c 8d STA ABSOLUTE 01 02 
+f80f 20 JSR ABSOLUTE 8f ff 
+f812 10 BPL RELATIVE 19 
+f814 38 SEC IMPLIED 
+f815 ad LDA ABSOLUTE 2b 02 
+f818 e9 SBC IMMEDIATE 40 
+f81a 8d STA ABSOLUTE 2b 02 
+f81d ad LDA ABSOLUTE 2c 02 
+f820 e9 SBC IMMEDIATE 00 
+f822 8d STA ABSOLUTE 2c 02 
+f825 20 JSR ABSOLUTE cf fb 
+f828 b0 BCS RELATIVE 03 
+f82a 20 JSR ABSOLUTE d1 ff 
+f82d 8e STX ABSOLUTE 00 02 
+f830 20 JSR ABSOLUTE 88 ff 
+f833 4c JMP ABSOLUTE d2 f8 
+f836 8d STA ABSOLUTE 02 02		// Print line
+f839 48 PHA IMPLIED				// Push A X and Y
+f83a 8a TXA IMPLIED 
+f83b 48 PHA IMPLIED 
+f83c 98 TYA IMPLIED 
+f83d 48 PHA IMPLIED 
+f83e ad LDA ABSOLUTE 02 02		// Get string character
+f841 d0 BNE RELATIVE 03			// Skip JMP if not a null character
+f843 4c JMP ABSOLUTE d2 f8 
+f846 ac LDY ABSOLUTE 06 02 
+f849 f0 BEQ RELATIVE 03 
+f84b 20 JSR ABSOLUTE e1 fc 
+f84e c9 CMP IMMEDIATE 5f		// Is character in A an underscore?
+f850 f0 BEQ RELATIVE ae 
+f852 c9 CMP IMMEDIATE 0c		// Is character in A an FF?
+f854 d0 BNE RELATIVE 0b			// Not a, skip to next check (f861)
+f856 20 JSR ABSOLUTE 8c ff 
+f859 20 JSR ABSOLUTE d1 ff 
+f85c 8e STX ABSOLUTE 00 02 
+f85f f0 BEQ RELATIVE 6e 
+f861 c9 CMP IMMEDIATE 0a		// Is character in A a LF?
+f863 f0 BEQ RELATIVE 27 
+f865 c9 CMP IMMEDIATE 1e		// Is character in A a RS (Record Separator)?
+f867 f0 BEQ RELATIVE 77 
+f869 c9 CMP IMMEDIATE 0b		Is character in A a VT?
+f86b f0 BEQ RELATIVE 10 
+f86d c9 CMP IMMEDIATE 1a		// Is character in A a SUB (Substitute)?
+f86f f0 BEQ RELATIVE 67 
+f871 c9 CMP IMMEDIATE 0d		// Is character in A a CR?
+f873 d0 BNE RELATIVE 05 
+f875 20 JSR ABSOLUTE 6d ff 
+f878 d0 BNE RELATIVE 58 
+f87a 8d STA ABSOLUTE 01 02		// 
+f87d 20 JSR ABSOLUTE 8c ff		// Use code in RAM to print char on screen
+f880 ee INC ABSOLUTE 00 02 
+f883 e8 INX IMPLIED 
+f884 ec CPX ABSOLUTE 22 02 
+f887 30 BMI RELATIVE 46 
+f889 20 JSR ABSOLUTE 70 ff 
+f88c 20 JSR ABSOLUTE 8c ff 
+f88f a0 LDY IMMEDIATE 02 
+f891 20 JSR ABSOLUTE d2 fb 
+f894 b0 BCS RELATIVE 08 
+f896 a2 LDX IMMEDIATE 03 
+f898 20 JSR ABSOLUTE ee fd 
+f89b 4c JMP ABSOLUTE cf f8 
+f89e 20 JSR ABSOLUTE 28 fe 
+f8a1 20 JSR ABSOLUTE d1 ff 
+f8a4 20 JSR ABSOLUTE ee fd 
+f8a7 ae LDX ABSOLUTE 22 02 
+f8aa 20 JSR ABSOLUTE 27 02 
+f8ad 10 BPL RELATIVE fb 
+f8af e8 INX IMPLIED 
+f8b0 20 JSR ABSOLUTE ee fd 
+f8b3 a2 LDX IMMEDIATE 03 
+f8b5 20 JSR ABSOLUTE ee fd 
+f8b8 20 JSR ABSOLUTE cf fb 
+f8bb 90 BCC RELATIVE ed 
+f8bd a9 LDA IMMEDIATE 20 
+f8bf 20 JSR ABSOLUTE 2a 02 
+f8c2 10 BPL RELATIVE fb 
+f8c4 a2 LDX IMMEDIATE 01 
+f8c6 bd LDA ABS_X 23 02 
+f8c9 9d STA ABS_X 28 02 
+f8cc ca DEX IMPLIED 
+f8cd 10 BPL RELATIVE f7 
+f8cf 20 JSR ABSOLUTE 75 ff 
+f8d2 68 PLA IMPLIED				// Null in string
+f8d3 a8 TAY IMPLIED 
+f8d4 68 PLA IMPLIED 
+f8d5 aa TAX IMPLIED 
+f8d6 68 PLA IMPLIED 
+f8d7 60 RTS IMPLIED 
+f8d8 20 JSR ABSOLUTE 59 fe 
+f8db 8d STA ABSOLUTE 01 02 
+f8de f0 BEQ RELATIVE 24 
+f8e0 a9 LDA IMMEDIATE 20 
+f8e2 20 JSR ABSOLUTE 8f ff 
+f8e5 20 JSR ABSOLUTE d1 ff 
+f8e8 ae LDX ABSOLUTE 22 02 
+f8eb a9 LDA IMMEDIATE 20 
+f8ed 20 JSR ABSOLUTE 2a 02 
+f8f0 10 BPL RELATIVE fb 
+f8f2 8d STA ABSOLUTE 01 02 
+f8f5 a0 LDY IMMEDIATE 02 
+f8f7 20 JSR ABSOLUTE d2 fb 
+f8fa b0 BCS RELATIVE 08 
+f8fc a2 LDX IMMEDIATE 03 
+f8fe 20 JSR ABSOLUTE ee fd 
+f901 4c JMP ABSOLUTE e8 f8 
+f904 20 JSR ABSOLUTE d1 ff 
+f907 8e STX ABSOLUTE 00 02 
+f90a f0 BEQ RELATIVE c6 
+f90c 20 JSR ABSOLUTE a6 f9 
+f90f 20 JSR ABSOLUTE f5 fb 
+f912 20 JSR ABSOLUTE b6 fe 
+f915 20 JSR ABSOLUTE e6 fb 
+f918 20 JSR ABSOLUTE e0 fb 
+f91b a2 LDX IMMEDIATE 08 
+f91d 86 STX ZERO_PAGE fd 
+f91f 20 JSR ABSOLUTE e6 fb 
+f922 20 JSR ABSOLUTE f0 fe 
+f925 20 JSR ABSOLUTE eb fb 
+f928 b0 BCS RELATIVE 51 
+f92a 20 JSR ABSOLUTE f9 fe 
+f92d c6 DEC ZERO_PAGE fd 
+f92f d0 BNE RELATIVE ee 
+f931 f0 BEQ RELATIVE dc 
+f933 20 JSR ABSOLUTE bd ff 
+f936 20 JSR ABSOLUTE e4 fd 
+f939 b0 BCS RELATIVE 43 
+f93b a6 LDX ZERO_PAGE e4 
+f93d 9a TXS IMPLIED 
+f93e a5 LDA ZERO_PAGE e6 
+f940 48 PHA IMPLIED 
+f941 a5 LDA ZERO_PAGE e5 
+f943 48 PHA IMPLIED 
+f944 a5 LDA ZERO_PAGE e3 
+f946 48 PHA IMPLIED 
+f947 a5 LDA ZERO_PAGE e0 
+f949 a6 LDX ZERO_PAGE e1 
+f94b a4 LDY ZERO_PAGE e2 
+f94d 40 RTI IMPLIED 
+f94e a2 LDX IMMEDIATE 03 
+f950 bd LDA ABS_X 4b fa 
+f953 9d STA ABS_X bf 01 
+f956 ca DEX IMPLIED 
+f957 d0 BNE RELATIVE f7 
+f959 20 JSR ABSOLUTE 8d fe 
+f95c 20 JSR ABSOLUTE b5 f9 
+f95f b1 LDA IND_Y fe 
+f961 85 STA ZERO_PAGE e7 
+f963 98 TYA IMPLIED 
+f964 91 STA IND_Y fe 
+f966 f0 BEQ RELATIVE 16 
+f968 4c JMP ABSOLUTE 7e fa 
+f96b c6 DEC ZERO_PAGE fb 
+f96d d0 BNE RELATIVE 79 
+f96f f0 BEQ RELATIVE 9b 
+f971 60 RTS IMPLIED 
+f972 a5 LDA ZERO_PAGE fb 
+f974 d0 BNE RELATIVE fb 
+f976 a9 LDA IMMEDIATE 3f 
+f978 20 JSR ABSOLUTE ee ff 
+f97b a2 LDX IMMEDIATE 28 
+f97d 9a TXS IMPLIED 
+f97e 20 JSR ABSOLUTE f5 fb		// *** Entry to command/address mode
+f981 a0 LDY IMMEDIATE 00 
+f983 84 STY ZERO_PAGE fb 
+f985 20 JSR ABSOLUTE e0 fb 
+f988 20 JSR ABSOLUTE 8d fe 
+f98b c9 CMP IMMEDIATE 4d 
+f98d f0 BEQ RELATIVE a4 
+f98f c9 CMP IMMEDIATE 52 
+f991 f0 BEQ RELATIVE a8 
+f993 c9 CMP IMMEDIATE 5a 
+f995 f0 BEQ RELATIVE b7 
+f997 c9 CMP IMMEDIATE 53 
+f999 f0 BEQ RELATIVE cd 
+f99b c9 CMP IMMEDIATE 4c 
+f99d f0 BEQ RELATIVE cc 
+f99f c9 CMP IMMEDIATE 55 
+f9a1 d0 BNE RELATIVE 33 
+f9a3 6c JMP INDIRECT 33 02 
+f9a6 20 JSR ABSOLUTE 8d fe 
+f9a9 20 JSR ABSOLUTE b5 f9 
+f9ac 20 JSR ABSOLUTE e3 fb 
+f9af a2 LDX IMMEDIATE 00 
+f9b1 20 JSR ABSOLUTE 8d fe 
+f9b4 2c BIT ABSOLUTE a2 05 
+f9b7 20 JSR ABSOLUTE c0 f9 
+f9ba 20 JSR ABSOLUTE 8d fe 
+f9bd 2c BIT ABSOLUTE a2 03 
+f9c0 20 JSR ABSOLUTE c6 f9 
+f9c3 20 JSR ABSOLUTE 8d fe 
+f9c6 c9 CMP IMMEDIATE 2e 
+f9c8 f0 BEQ RELATIVE be 
+f9ca c9 CMP IMMEDIATE 2f 
+f9cc f0 BEQ RELATIVE 1a 
+f9ce 20 JSR ABSOLUTE 93 fe 
+f9d1 30 BMI RELATIVE 9f 
+f9d3 4c JMP ABSOLUTE da fe 
+f9d6 c9 CMP IMMEDIATE 54 
+f9d8 f0 BEQ RELATIVE 95 
+f9da 20 JSR ABSOLUTE b5 f9 
+f9dd a9 LDA IMMEDIATE 2f 
+f9df 20 JSR ABSOLUTE ee ff 
+f9e2 20 JSR ABSOLUTE f0 fe 
+f9e5 20 JSR ABSOLUTE e6 fb 
+f9e8 20 JSR ABSOLUTE 8d fe 
+f9eb c9 CMP IMMEDIATE 47 
+f9ed d0 BNE RELATIVE 03 
+f9ef 6c JMP INDIRECT fe 00 
+f9f2 c9 CMP IMMEDIATE 2c 
+f9f4 d0 BNE RELATIVE 06 
+f9f6 20 JSR ABSOLUTE f9 fe 
+f9f9 4c JMP ABSOLUTE e8 f9 
+f9fc c9 CMP IMMEDIATE 0a 
+f9fe f0 BEQ RELATIVE 16 
+fa00 c9 CMP IMMEDIATE 0d 
+fa02 f0 BEQ RELATIVE 17 
+fa04 c9 CMP IMMEDIATE 5e 
+fa06 f0 BEQ RELATIVE 19 
+fa08 c9 CMP IMMEDIATE 27 
+fa0a f0 BEQ RELATIVE 2e 
+fa0c 20 JSR ABSOLUTE be f9 
+fa0f a5 LDA ZERO_PAGE fc 
+fa11 91 STA IND_Y fe 
+fa13 4c JMP ABSOLUTE e8 f9 
+fa16 a9 LDA IMMEDIATE 0d 
+fa18 20 JSR ABSOLUTE ee ff 
+fa1b 20 JSR ABSOLUTE f9 fe 
+fa1e 4c JMP ABSOLUTE 31 fa 
+fa21 38 SEC IMPLIED 
+fa22 a5 LDA ZERO_PAGE fe 
+fa24 e9 SBC IMMEDIATE 01 
+fa26 85 STA ZERO_PAGE fe 
+fa28 a5 LDA ZERO_PAGE ff 
+fa2a e9 SBC IMMEDIATE 00 
+fa2c 85 STA ZERO_PAGE ff 
+fa2e 20 JSR ABSOLUTE f5 fb		// *** Entry to data mode loop, prints current address and data
+fa31 20 JSR ABSOLUTE b6 fe 
+fa34 4c JMP ABSOLUTE dd f9 
+fa37 20 JSR ABSOLUTE f7 fe 
+fa3a 20 JSR ABSOLUTE 8d fe 
+fa3d c9 CMP IMMEDIATE 27 
+fa3f d0 BNE RELATIVE 05 
+fa41 20 JSR ABSOLUTE e3 fb 
+fa44 d0 BNE RELATIVE cd 
+fa46 c9 CMP IMMEDIATE 0d 
+fa48 f0 BEQ RELATIVE e4 
+fa4a d0 BNE RELATIVE eb 
+fa4c 4c JMP ABSOLUTE 4f fa 
+fa4f 85 STA ZERO_PAGE e0 
+fa51 68 PLA IMPLIED 
+fa52 48 PHA IMPLIED 
+fa53 29 AND IMMEDIATE 10 
+fa55 d0 BNE RELATIVE 03 
+fa57 a5 LDA ZERO_PAGE e0 
+fa59 40 RTI IMPLIED 
+fa5a 86 STX ZERO_PAGE e1 
+fa5c 84 STY ZERO_PAGE e2 
+fa5e 68 PLA IMPLIED 
+fa5f 85 STA ZERO_PAGE e3 
+fa61 d8 CLD IMPLIED 
+fa62 38 SEC IMPLIED 
+fa63 68 PLA IMPLIED 
+fa64 e9 SBC IMMEDIATE 02 
+fa66 85 STA ZERO_PAGE e5 
+fa68 68 PLA IMPLIED 
+fa69 e9 SBC IMMEDIATE 00 
+fa6b 85 STA ZERO_PAGE e6 
+fa6d ba TSX IMPLIED 
+fa6e 86 STX ZERO_PAGE e4 
+fa70 a0 LDY IMMEDIATE 00 
+fa72 a5 LDA ZERO_PAGE e7 
+fa74 91 STA IND_Y e5 
+fa76 a9 LDA IMMEDIATE e0 
+fa78 85 STA ZERO_PAGE fe 
+fa7a 84 STY ZERO_PAGE ff 
+fa7c d0 BNE RELATIVE b0 
+fa7e 20 JSR ABSOLUTE bd ff		// *** Start of assembly save routine
+fa81 20 JSR ABSOLUTE f7 ff 
+fa84 20 JSR ABSOLUTE e9 fe 
+fa87 20 JSR ABSOLUTE ee ff 
+fa8a 20 JSR ABSOLUTE e3 ff 
+fa8d a9 LDA IMMEDIATE 2f 
+fa8f 20 JSR ABSOLUTE ee ff 
+fa92 d0 BNE RELATIVE 03 
+fa94 20 JSR ABSOLUTE f9 fe 
+fa97 20 JSR ABSOLUTE f0 fe 
+fa9a a9 LDA IMMEDIATE 0d 
+fa9c 20 JSR ABSOLUTE b1 fc 
+fa9f 20 JSR ABSOLUTE eb fb 
+faa2 90 BCC RELATIVE f0 
+faa4 a5 LDA ZERO_PAGE e4 
+faa6 a6 LDX ZERO_PAGE e5 
+faa8 85 STA ZERO_PAGE fe 
+faaa 86 STX ZERO_PAGE ff 
+faac 20 JSR ABSOLUTE e3 ff 
+faaf a9 LDA IMMEDIATE 47 
+fab1 20 JSR ABSOLUTE ee ff 
+fab4 20 JSR ABSOLUTE ac ff 
+fab7 8c STY ABSOLUTE 05 02 
+faba 4c JMP ABSOLUTE 7e f9 
+fabd 8a TXA IMPLIED				// *** Entry to screen editor
+fabe 48 PHA IMPLIED 
+fabf 98 TYA IMPLIED 
+fac0 48 PHA IMPLIED 
+fac1 ad LDA ABSOLUTE 04 02 
+fac4 10 BPL RELATIVE 59			// Branch to editor mode
+fac6 ac LDY ABSOLUTE 2f 02		// Cursor position to Y
+fac9 ad LDA ABSOLUTE 31 02 
+facc 85 STA ZERO_PAGE e4 
+face ad LDA ABSOLUTE 32 02 
+fad1 85 STA ZERO_PAGE e5 
+fad3 b1 LDA IND_Y e4 
+fad5 8d STA ABSOLUTE 30 02 
+fad8 a9 LDA IMMEDIATE a1 
+fada 91 STA IND_Y e4 
+fadc 20 JSR ABSOLUTE 00 fd 
+fadf ad LDA ABSOLUTE 30 02 
+fae2 91 STA IND_Y e4 
+fae4 ad LDA ABSOLUTE 15 02 
+fae7 c9 CMP IMMEDIATE 11 
+fae9 f0 BEQ RELATIVE 28 
+faeb c9 CMP IMMEDIATE 01 
+faed f0 BEQ RELATIVE 1e 
+faef c9 CMP IMMEDIATE 04 
+faf1 f0 BEQ RELATIVE 14 
+faf3 c9 CMP IMMEDIATE 13 
+faf5 f0 BEQ RELATIVE 0a 
+faf7 c9 CMP IMMEDIATE 06 
+faf9 d0 BNE RELATIVE 27 
+fafb 20 JSR ABSOLUTE 7c fb 
+fafe 4c JMP ABSOLUTE c6 fa 
+fb01 20 JSR ABSOLUTE 28 fe 
+fb04 4c JMP ABSOLUTE c6 fa 
+fb07 20 JSR ABSOLUTE 6b fb 
+fb0a 4c JMP ABSOLUTE c6 fa 
+fb0d 20 JSR ABSOLUTE 19 fe 
+fb10 4c JMP ABSOLUTE c6 fa 
+fb13 ad LDA ABSOLUTE 30 02 
+fb16 8d STA ABSOLUTE 15 02 
+fb19 20 JSR ABSOLUTE 6b fb 
+fb1c 4c JMP ABSOLUTE 43 fb 
+fb1f 20 JSR ABSOLUTE 00 fd		// *** Edit mode, call wait for key pressed
+fb22 c9 CMP IMMEDIATE 05 
+fb24 d0 BNE RELATIVE 1d 
+fb26 ad LDA ABSOLUTE 04 02 
+fb29 49 EOR IMMEDIATE ff 
+fb2b 8d STA ABSOLUTE 04 02 
+fb2e 10 BPL RELATIVE ef 
+fb30 ad LDA ABSOLUTE 2b 02 
+fb33 8d STA ABSOLUTE 31 02 
+fb36 ad LDA ABSOLUTE 2c 02 
+fb39 8d STA ABSOLUTE 32 02 
+fb3c a2 LDX IMMEDIATE 00 
+fb3e 8e STX ABSOLUTE 2f 02 
+fb41 f0 BEQ RELATIVE 83 
+fb43 4c JMP ABSOLUTE d3 fd 
+fb46 2c BIT ABSOLUTE 03 02		// *** BASIC input routine, get a char from keyboard or ACIA
+fb49 10 BPL RELATIVE 1d			// Line above tested ACIA flag, bransch to ACIA if set
+fb4b a9 LDA IMMEDIATE fd 
+fb4d 8d STA ABSOLUTE 00 df 
+fb50 a9 LDA IMMEDIATE 10 
+fb52 2c BIT ABSOLUTE 00 df 
+fb55 f0 BEQ RELATIVE 0a 
+fb57 ad LDA ABSOLUTE 00 f0 
+fb5a 4a LSR ACCUMULATOR 
+fb5b 90 BCC RELATIVE ee 
+fb5d ad LDA ABSOLUTE 01 f0 
+fb60 60 RTS IMPLIED 
+fb61 a9 LDA IMMEDIATE 00 
+fb63 85 STA ZERO_PAGE fb 
+fb65 8d STA ABSOLUTE 03 02 
+fb68 4c JMP ABSOLUTE bd fa		// Keyboard input (not ACIA) from fb49 BPL
+fb6b ae LDX ABSOLUTE 22 02 
+fb6e ec CPX ABSOLUTE 2f 02 
+fb71 f0 BEQ RELATIVE 04 
+fb73 ee INC ABSOLUTE 2f 02 
+fb76 60 RTS IMPLIED 
+fb77 a2 LDX IMMEDIATE 00 
+fb79 8e STX ABSOLUTE 2f 02 
+fb7c 18 CLC IMPLIED 
+fb7d ad LDA ABSOLUTE 31 02 
+fb80 69 ADC IMMEDIATE 40 
+fb82 8d STA ABSOLUTE 31 02 
+fb85 ad LDA ABSOLUTE 32 02 
+fb88 69 ADC IMMEDIATE 00 
+fb8a c9 CMP IMMEDIATE d8 
+fb8c d0 BNE RELATIVE 02 
+fb8e a9 LDA IMMEDIATE d0 
+fb90 8d STA ABSOLUTE 32 02 
+fb93 60 RTS IMPLIED 
+fb94 ad LDA ABSOLUTE 12 02 
+fb97 d0 BNE RELATIVE fa 
+fb99 a9 LDA IMMEDIATE fe 
+fb9b 8d STA ABSOLUTE 00 df 
+fb9e 2c BIT ABSOLUTE 00 df 
+fba1 70 BVS RELATIVE f0 
+fba3 a9 LDA IMMEDIATE fb 
+fba5 8d STA ABSOLUTE 00 df 
+fba8 2c BIT ABSOLUTE 00 df 
+fbab 70 BVS RELATIVE e6 
+fbad a9 LDA IMMEDIATE 03 
+fbaf 4c JMP ABSOLUTE 36 a6			// Jump to BASIC
+fbb2 46 LSR ZERO_PAGE fb			// This is some code/data read from fe42
+fbb4 9b???  ff						//
+fbb6 94 STY Z_PAGE_X fb				// 46 fb 9b ff  Fû›ÿ
+fbb8 70 BVS RELATIVE fe				// 64 fb 70 fe  dûpþ
+fbba 7b???  fe						// 7b fe 2f 4c  {þ/L
+fbbc 2f???  4c						// d0 4c d7 bd  
+fbbe d0 BNE RELATIVE 4c				// 8c d0 9d 8c  STA ABS,X 8c d0  DEX RTS
+fbc0 d7???  bd						// d0 ca 60 00  
+fbc2 8c STY ABSOLUTE d0 9d			// 20 8c d0 88  
+fbc5 8c STY ABSOLUTE d0 ca			// f9 ae 22     
+fbc8 60 RTS IMPLIED					// 
+fbc9 00 BRK IMPLIED					//
+fbca 20 JSR ABSOLUTE 8c d0			//
+fbcd 88 DEY IMPLIED					//
+fbce f9 SBC ABS_Y ae 22				// -----------------------------------
+fbd1 02???  38 ad 
+fbd4 2b???  02 f9 
+fbd7 23???  02 ad 
+fbda 2c BIT ABSOLUTE 02 f9 
+fbdd 24 BIT ZERO_PAGE 02 
+fbdf 60 RTS IMPLIED 
+fbe0 a9 LDA IMMEDIATE 3e 
+fbe2 2c BIT ABSOLUTE a9 2c 
+fbe5 2c BIT ABSOLUTE a9 20 
+fbe8 4c JMP ABSOLUTE ee ff 
+fbeb 38 SEC IMPLIED 
+fbec a5 LDA ZERO_PAGE fe 
+fbee e5 SBC ZERO_PAGE f9 
+fbf0 a5 LDA ZERO_PAGE ff 
+fbf2 e5 SBC ZERO_PAGE fa 
+fbf4 60 RTS IMPLIED 
+fbf5 a9 LDA IMMEDIATE 0d 
+fbf7 20 JSR ABSOLUTE ee ff 
+fbfa a9 LDA IMMEDIATE 0a 
+fbfc 4c JMP ABSOLUTE ee ff 
+fbff 40 RTI IMPLIED 
+fc00 20 JSR ABSOLUTE 0c fc		// *** Entry to disc bootstrap
+fc03 6c JMP INDIRECT fd 00 
+fc06 20 JSR ABSOLUTE 0c fc 
+fc09 4c JMP ABSOLUTE 00 fe      // Jump to initiate and run monitor
+fc0c a0 LDY IMMEDIATE 00 
+fc0e 8c STY ABSOLUTE 01 c0 
+fc11 8c STY ABSOLUTE 00 c0 
+fc14 a2 LDX IMMEDIATE 04 
+fc16 8e STX ABSOLUTE 01 c0 
+fc19 8c STY ABSOLUTE 03 c0 
+fc1c 88 DEY IMPLIED 
+fc1d 8c STY ABSOLUTE 02 c0 
+fc20 8e STX ABSOLUTE 03 c0 
+fc23 8c STY ABSOLUTE 02 c0 
+fc26 a9 LDA IMMEDIATE fb 
+fc28 d0 BNE RELATIVE 09 
+fc2a a9 LDA IMMEDIATE 02 
+fc2c 2c BIT ABSOLUTE 00 c0 
+fc2f f0 BEQ RELATIVE 1c 
+fc31 a9 LDA IMMEDIATE ff 
+fc33 8d STA ABSOLUTE 02 c0 
+fc36 20 JSR ABSOLUTE a5 fc 
+fc39 29 AND IMMEDIATE f7 
+fc3b 8d STA ABSOLUTE 02 c0 
+fc3e 20 JSR ABSOLUTE a5 fc 
+fc41 09 ORA IMMEDIATE 08 
+fc43 8d STA ABSOLUTE 02 c0 
+fc46 a2 LDX IMMEDIATE 18 
+fc48 20 JSR ABSOLUTE 91 fc 
+fc4b f0 BEQ RELATIVE dd 
+fc4d a2 LDX IMMEDIATE 7f 
+fc4f 8e STX ABSOLUTE 02 c0 
+fc52 20 JSR ABSOLUTE 91 fc 
+fc55 ad LDA ABSOLUTE 00 c0 
+fc58 30 BMI RELATIVE fb 
+fc5a ad LDA ABSOLUTE 00 c0 
+fc5d 10 BPL RELATIVE fb 
+fc5f a9 LDA IMMEDIATE 03 
+fc61 8d STA ABSOLUTE 10 c0 
+fc64 a9 LDA IMMEDIATE 58 
+fc66 8d STA ABSOLUTE 10 c0 
+fc69 20 JSR ABSOLUTE 9c fc 
+fc6c 85 STA ZERO_PAGE fe 
+fc6e aa TAX IMPLIED 
+fc6f 20 JSR ABSOLUTE 9c fc 
+fc72 85 STA ZERO_PAGE fd 
+fc74 20 JSR ABSOLUTE 9c fc 
+fc77 85 STA ZERO_PAGE ff 
+fc79 a0 LDY IMMEDIATE 00 
+fc7b 20 JSR ABSOLUTE 9c fc 
+fc7e 91 STA IND_Y fd 
+fc80 c8 INY IMPLIED 
+fc81 d0 BNE RELATIVE f8 
+fc83 e6 INC ZERO_PAGE fe 
+fc85 c6 DEC ZERO_PAGE ff 
+fc87 d0 BNE RELATIVE f2 
+fc89 86 STX ZERO_PAGE fe 
+fc8b a9 LDA IMMEDIATE ff 
+fc8d 8d STA ABSOLUTE 02 c0 
+fc90 60 RTS IMPLIED 
+fc91 a0 LDY IMMEDIATE f8 
+fc93 88 DEY IMPLIED 
+fc94 d0 BNE RELATIVE fd 
+fc96 55 EOR Z_PAGE_X ff 
+fc98 ca DEX IMPLIED 
+fc99 d0 BNE RELATIVE f6 
+fc9b 60 RTS IMPLIED 
+fc9c ad LDA ABSOLUTE 10 c0 
+fc9f 4a LSR ACCUMULATOR 
+fca0 90 BCC RELATIVE fa 
+fca2 ad LDA ABSOLUTE 11 c0 
+fca5 60 RTS IMPLIED 
+fca6 a9 LDA IMMEDIATE 03        // Initiate cassette interface.
+fca8 8d STA ABSOLUTE 00 f0		//
+fcab a9 LDA IMMEDIATE 11		//
+fcad 8d STA ABSOLUTE 00 f0		//
+fcb0 60 RTS IMPLIED				//-----------------------------
+fcb1 48 PHA IMPLIED				// *** Ouput one byte from A to cassette
+fcb2 ad LDA ABSOLUTE 00 f0 
+fcb5 4a LSR ACCUMULATOR 
+fcb6 4a LSR ACCUMULATOR 
+fcb7 90 BCC RELATIVE f9 
+fcb9 68 PLA IMPLIED 
+fcba 8d STA ABSOLUTE 01 f0 
+fcbd 60 RTS IMPLIED 
+fcbe 49 EOR IMMEDIATE ff        // Invert bits (keyboard matrix bits are 1 unless key is pressed
+fcc0 8d STA ABSOLUTE 00 df      // Write row number to keyboard
+fcc3 49 EOR IMMEDIATE ff		// Invert A back
+fcc5 60 RTS IMPLIED				//--------------------------------------------------------------
+fcc6 48 PHA IMPLIED             // Push A (row number) to stack for later use
+fcc7 20 JSR ABSOLUTE cf fc      // Read kbrd into A and invert
+fcca aa TAX IMPLIED             // Store row data in X
+fccb 68 PLA IMPLIED             // Restore A from stack
+fccc ca DEX IMPLIED             // Decrement X and
+fccd e8 INX IMPLIED             // increment back to get overflow and zero flags set
+fcce 60 RTS IMPLIED 
+fccf ad LDA ABSOLUTE 00 df      // Read keyboard into A
+fcd2 49 EOR IMMEDIATE ff 
+fcd4 60 RTS IMPLIED 
+fcd5 c9 CMP IMMEDIATE 5f 
+fcd7 f0 BEQ RELATIVE 03 
+fcd9 4c JMP ABSOLUTE 74 a3 
+fcdc 4c JMP ABSOLUTE 4b a3 
+fcdf a0 LDY IMMEDIATE 10        // Key debounce delay
+fce1 a2 LDX IMMEDIATE 40        //
+fce3 ca DEX IMPLIED             //
+fce4 d0 BNE RELATIVE fd         //
+fce6 88 DEY IMPLIED             //
+fce7 d0 BNE RELATIVE f8         //
+fce9 60 RTS IMPLIED             //-------------------
+fcea 43???                      // String: CEGMON(C)1980 D/C/W/M?
+fceb 45 EOR ZERO_PAGE 47        //
+fced 4d EOR ABSOLUTE 4f 4e      //
+fcf0 28 PLP IMPLIED             //
+fcf1 43???                      //
+fcf2 29 AND IMMEDIATE 31        //  
+fcf4 39 AND ABS_Y 38 30         //
+fcf7 20 JSR ABSOLUTE 44 2f      //
+fcfa 43???  2f 57               //
+fcfd 2f???  4d 3f               //-------------------------------
+fd00 8a TXA IMPLIED				// *** Keyboard input routine 
+fd01 48 PHA IMPLIED 
+fd02 98 TYA IMPLIED 
+fd03 48 PHA IMPLIED 
+fd04 a9 LDA IMMEDIATE 80 
+fd06 20 JSR ABSOLUTE be fc      // Write inverted row bits to keyboard 
+fd09 20 JSR ABSOLUTE c6 fc      // Check row for pressed key(s). Result: row in A, column in X status from X
+fd0c d0 BNE RELATIVE 05         // Branch if X holds key(s) pressed
+fd0e 4a LSR ACCUMULATOR 
+fd0f d0 BNE RELATIVE f5 
+fd11 f0 BEQ RELATIVE 27 
+fd13 4a LSR ACCUMULATOR         // Keypress detected, row in A, Key(s) in X.
+fd14 90 BCC RELATIVE 09 
+fd16 8a TXA IMPLIED 
+fd17 29 AND IMMEDIATE 20 
+fd19 f0 BEQ RELATIVE 1f 
+fd1b a9 LDA IMMEDIATE 1b 
+fd1d d0 BNE RELATIVE 31 
+fd1f 20 JSR ABSOLUTE 86 fe      // Get bit 1 position in A into Y as number
+fd22 98 TYA IMPLIED             // Store row number in A as a number (not as a bit position)
+fd23 8d STA ABSOLUTE 15 02      // Store row number in RAM 0215
+fd26 0a ASL ACCUMULATOR 
+fd27 0a ASL ACCUMULATOR 
+fd28 0a ASL ACCUMULATOR 
+fd29 38 SEC IMPLIED 
+fd2a ed SBC ABSOLUTE 15 02 
+fd2d 8d STA ABSOLUTE 15 02 
+fd30 8a TXA IMPLIED 
+fd31 4a LSR ACCUMULATOR 
+fd32 0a ASL ACCUMULATOR 
+fd33 20 JSR ABSOLUTE 86 fe		// Convert bit position in A to digit in Y
+fd36 f0 BEQ RELATIVE 0f 
+fd38 a9 LDA IMMEDIATE 00 
+fd3a 8d STA ABSOLUTE 16 02 
+fd3d 8d STA ABSOLUTE 13 02 
+fd40 a9 LDA IMMEDIATE 02 
+fd42 8d STA ABSOLUTE 14 02 
+fd45 d0 BNE RELATIVE bd 
+fd47 18 CLC IMPLIED 
+fd48 98 TYA IMPLIED 
+fd49 6d ADC ABSOLUTE 15 02 
+fd4c a8 TAY IMPLIED 
+fd4d b9 LDA ABS_Y 3b ff			// Fetch ASCII from keyboard map at ff3b + Y
+fd50 cd CMP ABSOLUTE 13 02 
+fd53 d0 BNE RELATIVE e8 
+fd55 ce DEC ABSOLUTE 14 02		// Menu selected 'M' detected, go to assembly editor
+fd58 f0 BEQ RELATIVE 05 
+fd5a 20 JSR ABSOLUTE df fc      // Call 10 ms delay
+fd5d f0 BEQ RELATIVE a5 
+fd5f a2 LDX IMMEDIATE 64 
+fd61 cd CMP ABSOLUTE 16 02 
+fd64 d0 BNE RELATIVE 02 
+fd66 a2 LDX IMMEDIATE 0f 
+fd68 8e STX ABSOLUTE 14 02 
+fd6b 8d STA ABSOLUTE 16 02 
+fd6e c9 CMP IMMEDIATE 21 
+fd70 30 BMI RELATIVE 5e 
+fd72 c9 CMP IMMEDIATE 5f 
+fd74 f0 BEQ RELATIVE 5a 
+fd76 a9 LDA IMMEDIATE 01 
+fd78 20 JSR ABSOLUTE be fc 
+fd7b 20 JSR ABSOLUTE cf fc      // Read kbrd into A and invert
+fd7e 8d STA ABSOLUTE 15 02 
+fd81 29 AND IMMEDIATE 01 
+fd83 aa TAX IMPLIED 
+fd84 ad LDA ABSOLUTE 15 02 
+fd87 29 AND IMMEDIATE 06 
+fd89 d0 BNE RELATIVE 17 
+fd8b 2c BIT ABSOLUTE 13 02 
+fd8e 50 BVC RELATIVE 2b 
+fd90 8a TXA IMPLIED 
+fd91 49 EOR IMMEDIATE 01 
+fd93 29 AND IMMEDIATE 01 
+fd95 f0 BEQ RELATIVE 24 
+fd97 a9 LDA IMMEDIATE 20 
+fd99 2c BIT ABSOLUTE 15 02 
+fd9c 50 BVC RELATIVE 25 
+fd9e a9 LDA IMMEDIATE c0 
+fda0 d0 BNE RELATIVE 21 
+fda2 2c BIT ABSOLUTE 13 02 
+fda5 50 BVC RELATIVE 03 
+fda7 8a TXA IMPLIED 
+fda8 f0 BEQ RELATIVE 11 
+fdaa ac LDY ABSOLUTE 13 02 
+fdad c0 CPY IMMEDIATE 31 
+fdaf 90 BCC RELATIVE 08 
+fdb1 c0 CPY IMMEDIATE 3c 
+fdb3 b0 BCS RELATIVE 04 
+fdb5 a9 LDA IMMEDIATE f0 
+fdb7 d0 BNE RELATIVE 02 
+fdb9 a9 LDA IMMEDIATE 10 
+fdbb 2c BIT ABSOLUTE 15 02 
+fdbe 50 BVC RELATIVE 03 
+fdc0 18 CLC IMPLIED 
+fdc1 69 ADC IMMEDIATE c0 
+fdc3 18 CLC IMPLIED 
+fdc4 6d ADC ABSOLUTE 13 02 
+fdc7 29 AND IMMEDIATE 7f 
+fdc9 2c BIT ABSOLUTE 15 02 
+fdcc 10 BPL RELATIVE 02 
+fdce 09 ORA IMMEDIATE 80 
+fdd0 8d STA ABSOLUTE 15 02 
+fdd3 68 PLA IMPLIED 
+fdd4 a8 TAY IMPLIED 
+fdd5 68 PLA IMPLIED 
+fdd6 aa TAX IMPLIED 
+fdd7 ad LDA ABSOLUTE 15 02 
+fdda 60 RTS IMPLIED 
+fddb 20 JSR ABSOLUTE f9 fe 
+fdde e6 INC ZERO_PAGE e4 
+fde0 d0 BNE RELATIVE 02 
+fde2 e6 INC ZERO_PAGE e5 
+fde4 b1 LDA IND_Y fe 
+fde6 91 STA IND_Y e4 
+fde8 20 JSR ABSOLUTE eb fb 
+fdeb 90 BCC RELATIVE ee 
+fded 60 RTS IMPLIED 
+fdee 18 CLC IMPLIED 
+fdef a9 LDA IMMEDIATE 40 
+fdf1 7d ADC ABS_X 28 02 
+fdf4 9d STA ABS_X 28 02 
+fdf7 a9 LDA IMMEDIATE 00 
+fdf9 7d ADC ABS_X 29 02 
+fdfc 9d STA ABS_X 29 02 
+fdff 60 RTS IMPLIED 
+fe00 a2 LDX IMMEDIATE 28		// *** Entry to monitor, clears screen resets ACIA
+fe02 9a TXS IMPLIED 
+fe03 d8 CLD IMPLIED 
+fe04 20 JSR ABSOLUTE a6 fc 
+fe07 20 JSR ABSOLUTE 40 fe 
+fe0a ea NOP IMPLIED 
+fe0b ea NOP IMPLIED 
+fe0c 20 JSR ABSOLUTE 59 fe		// *** Entry to monitor, bypasses stack initialization
+fe0f 8d STA ABSOLUTE 01 02 
+fe12 84 STY ZERO_PAGE fe 
+fe14 84 STY ZERO_PAGE ff 
+fe16 4c JMP ABSOLUTE 7e f9 
+fe19 ae LDX ABSOLUTE 2f 02 
+fe1c f0 BEQ RELATIVE 04 
+fe1e ce DEC ABSOLUTE 2f 02 
+fe21 60 RTS IMPLIED 
+fe22 ae LDX ABSOLUTE 22 02 
+fe25 8e STX ABSOLUTE 2f 02 
+fe28 38 SEC IMPLIED 
+fe29 ad LDA ABSOLUTE 31 02 
+fe2c e9 SBC IMMEDIATE 40 
+fe2e 8d STA ABSOLUTE 31 02 
+fe31 ad LDA ABSOLUTE 32 02 
+fe34 e9 SBC IMMEDIATE 00 
+fe36 c9 CMP IMMEDIATE cf 
+fe38 d0 BNE RELATIVE 02 
+fe3a a9 LDA IMMEDIATE d7 
+fe3c 8d STA ABSOLUTE 32 02 
+fe3f 60 RTS IMPLIED 
+fe40 a0 LDY IMMEDIATE 1c        // Second routine called from reset
+fe42 b9 LDA ABS_Y b2 fb			// Copies some data from fbb2 - fbc7
+fe45 99 STA ABS_Y 18 02			// into ram 0218 - 0234
+fe48 88 DEY IMPLIED				//
+fe49 10 BPL RELATIVE f7			// loop copy next
+fe4b a0 LDY IMMEDIATE 07		// Done copy
+fe4d a9 LDA IMMEDIATE 00		// Clear memory area 0200 - 0207
+fe4f 8d STA ABSOLUTE 12 02		// That would be cursor position,
+fe52 99 STA ABS_Y ff 01			// load/save flags and CRT simulator baudrate
+fe55 88 DEY IMPLIED				//
+fe56 d0 BNE RELATIVE fa			// loop clear next
+fe58 60 RTS IMPLIED				//--------------------------------------------
+fe59 a0 LDY IMMEDIATE 00        // Third routine called from reset, clear screen
+fe5b 84 STY ZERO_PAGE f9        // Setting up CRT address d000 in RAM at 00f9 - 00fa
+fe5d a9 LDA IMMEDIATE d0        //
+fe5f 85 STA ZERO_PAGE fa		//
+fe61 a2 LDX IMMEDIATE 08		//
+fe63 a9 LDA IMMEDIATE 20		// Ascii blank
+fe65 91 STA IND_Y f9			// Clear one screen position 
+fe67 c8 INY IMPLIED				// Next position
+fe68 d0 BNE RELATIVE fb			// Loop back until ff positions cleared
+fe6a e6 INC ZERO_PAGE fa		// Prepare to clear next ff positions
+fe6c ca DEX IMPLIED				// -"-"
+fe6d d0 BNE RELATIVE f6			// Loop and continue clearing screen
+fe6f 60 RTS IMPLIED				//---------------------------------------------------
+fe70 48 PHA IMPLIED 
+fe71 ce DEC ABSOLUTE 03 02 
+fe74 a9 LDA IMMEDIATE 00 
+fe76 8d STA ABSOLUTE 05 02 
+fe79 68 PLA IMPLIED 
+fe7a 60 RTS IMPLIED 
+fe7b 48 PHA IMPLIED 
+fe7c a9 LDA IMMEDIATE 01 
+fe7e d0 BNE RELATIVE f6 
+fe80 20 JSR ABSOLUTE 57 fb		// *** Input ASCII char from cassette, result in A, 7 bit cleared
+fe83 29 AND IMMEDIATE 7f 
+fe85 60 RTS IMPLIED 
+fe86 a0 LDY IMMEDIATE 08        // Get position of bit 1 in A and store as a number in Y
+fe88 88 DEY IMPLIED             //
+fe89 0a ASL ACCUMULATOR         //
+fe8a 90 BCC RELATIVE fc         //
+fe8c 60 RTS IMPLIED             //------------------------------------------------------
+fe8d 20 JSR ABSOLUTE e9 fe 
+fe90 4c JMP ABSOLUTE ee ff 
+fe93 c9 CMP IMMEDIATE 30		// *** Convert ASCII hex to binary, result in A, = 80 if bad
+fe95 30 BMI RELATIVE 12 
+fe97 c9 CMP IMMEDIATE 3a 
+fe99 30 BMI RELATIVE 0b 
+fe9b c9 CMP IMMEDIATE 41 
+fe9d 30 BMI RELATIVE 0a 
+fe9f c9 CMP IMMEDIATE 47 
+fea1 10 BPL RELATIVE 06 
+fea3 38 SEC IMPLIED 
+fea4 e9 SBC IMMEDIATE 07 
+fea6 29 AND IMMEDIATE 0f 
+fea8 60 RTS IMPLIED 
+fea9 a9 LDA IMMEDIATE 80 
+feab 60 RTS IMPLIED 
+feac 20 JSR ABSOLUTE b6 fe 
+feaf ea NOP IMPLIED 
+feb0 ea NOP IMPLIED 
+feb1 20 JSR ABSOLUTE e6 fb 
+feb4 d0 BNE RELATIVE 07 
+feb6 a2 LDX IMMEDIATE 03 
+feb8 20 JSR ABSOLUTE bf fe 
+febb ca DEX IMPLIED 
+febc 2c BIT ABSOLUTE a2 00 
+febf b5 LDA Z_PAGE_X fc 
+fec1 4a LSR ACCUMULATOR 
+fec2 4a LSR ACCUMULATOR 
+fec3 4a LSR ACCUMULATOR 
+fec4 4a LSR ACCUMULATOR 
+fec5 20 JSR ABSOLUTE ca fe 
+fec8 b5 LDA Z_PAGE_X fc 
+feca 29 AND IMMEDIATE 0f 
+fecc 09 ORA IMMEDIATE 30 
+fece c9 CMP IMMEDIATE 3a 
+fed0 30 BMI RELATIVE 03 
+fed2 18 CLC IMPLIED 
+fed3 69 ADC IMMEDIATE 07 
+fed5 4c JMP ABSOLUTE ee ff 
+fed8 ea NOP IMPLIED 
+fed9 ea NOP IMPLIED 
+feda a0 LDY IMMEDIATE 04 
+fedc 0a ASL ACCUMULATOR 
+fedd 0a ASL ACCUMULATOR 
+fede 0a ASL ACCUMULATOR 
+fedf 0a ASL ACCUMULATOR 
+fee0 2a ROL ACCUMULATOR 
+fee1 36 ROL Z_PAGE_X f9 
+fee3 36 ROL Z_PAGE_X fa 
+fee5 88 DEY IMPLIED 
+fee6 d0 BNE RELATIVE f8 
+fee8 60 RTS IMPLIED 
+fee9 a5 LDA ZERO_PAGE fb 
+feeb d0 BNE RELATIVE 93 
+feed 4c JMP ABSOLUTE 00 fd 
+fef0 b1 LDA IND_Y fe 
+fef2 85 STA ZERO_PAGE fc 
+fef4 4c JMP ABSOLUTE bd fe 
+fef7 91 STA IND_Y fe 
+fef9 e6 INC ZERO_PAGE fe 
+fefb d0 BNE RELATIVE 02 
+fefd e6 INC ZERO_PAGE ff 
+feff 60 RTS IMPLIED 
+ff00 d8 CLD IMPLIED             // *** Reset start, clear decimal mode
+ff01 a2 LDX IMMEDIATE 28 
+ff03 9a TXS IMPLIED				// Set stackpointer at 0x0128 (because 0130 and up is taken)
+ff04 20 JSR ABSOLUTE a6 fc		// Initiate cassette interface
+ff07 20 JSR ABSOLUTE 40 fe		// Copy and initiating some data (see fe40) 
+ff0a 20 JSR ABSOLUTE 59 fe      // Clear screen
+ff0d 8c STY ABSOLUTE 00 02		// Clear cursor position (again?)
+ff10 b9 LDA ABS_Y ea fc			// Point at string 'CEGMON(C)1980 D/C/W/M?'
+ff13 20 JSR ABSOLUTE ee ff		// Print the line
+ff16 c8 INY IMPLIED 
+ff17 c0 CPY IMMEDIATE 16 
+ff19 d0 BNE RELATIVE f5 
+ff1b 20 JSR ABSOLUTE eb ff 
+ff1e 29 AND IMMEDIATE df 
+ff20 c9 CMP IMMEDIATE 44        // Compare to 'D'
+ff22 d0 BNE RELATIVE 03         // Skip if not equal
+ff24 4c JMP ABSOLUTE 00 fc      // Jump to disk routine
+ff27 c9 CMP IMMEDIATE 4d        // Compare to 'M'
+ff29 d0 BNE RELATIVE 03         // Skip if not equal
+ff2b 4c JMP ABSOLUTE 00 fe      // Jump to initiate and run monitor 
+ff2e c9 CMP IMMEDIATE 57        // Compare to 'W'
+ff30 d0 BNE RELATIVE 03         // Skip if not equal
+ff32 4c JMP ABSOLUTE 00 00      // Jump to Basic woarm start
+ff35 c9 CMP IMMEDIATE 43        // Compare to 'C'
+ff37 d0 BNE RELATIVE c7         // Jump back to FE72
+ff39 4c JMP ABSOLUTE 11 bd      // Jump to Basic cold start
+ff3c 50 BVC RELATIVE 3b         // Jump back to Reset start (FF00)
+ff3e 2f???  20                  // P ; / spc Keyboard matric map (reversed compared to manual image)
+ff40 5a???  41                  // Z A
+ff42 51 EOR IND_Y 2c            // Q   ,
+ff44 4d EOR ABSOLUTE 4e 42      // M N B
+ff47 56 LSR Z_PAGE_X 43         // 8
+ff49 58 CLI IMPLIED             //
+ff4a 4b???                      //
+ff4b 4a LSR ACCUMULATOR         //
+ff4c 48 PHA IMPLIED             //
+ff4d 47???                      //
+ff4e 46 LSR ZERO_PAGE 44        //
+ff50 53???  49                  //
+ff52 55 EOR Z_PAGE_X 59         //
+ff54 54???  52                  //
+ff56 45 EOR ZERO_PAGE 57        //
+ff58 00 BRK IMPLIED             //
+ff59 00 BRK IMPLIED             //
+ff5a 0d ORA ABSOLUTE 0a 4f      //
+ff5d 4c JMP ABSOLUTE 2e 00      //
+ff60 5f???  2d 3a               //
+ff63 30 BMI RELATIVE 39         //
+ff65 38 SEC IMPLIED             //
+ff66 37???                      //
+ff67 36 ROL Z_PAGE_X 35         //
+ff69 34???  33                  //
+ff6b 32???  31                  //
+ff6d 20 JSR ABSOLUTE 8c ff      //--------------------------------------------------------
+ff70 a2 LDX IMMEDIATE 00 
+ff72 8e STX ABSOLUTE 00 02 
+ff75 ae LDX ABSOLUTE 00 02 
+ff78 a9 LDA IMMEDIATE bd 		// Ram contains generic code affecting current position on screen
+ff7a 8d STA ABSOLUTE 2a 02		// The actual instruction is here changed to an STA ABS_X
+ff7d 20 JSR ABSOLUTE 2a 02		// and the instruction is here carried out. Also X is decremented.
+ff80 8d STA ABSOLUTE 01 02		// Fetch the character just read from screen and save it at 0201
+ff83 a9 LDA IMMEDIATE 9d
+ff85 8d STA ABSOLUTE 2a 02		// 
+ff88 a9 LDA IMMEDIATE 5f 
+ff8a d0 BNE RELATIVE 03 
+ff8c ad LDA ABSOLUTE 01 02		// Load character that is a bout to be printed
+ff8f ae LDX ABSOLUTE 00 02 
+ff92 4c JMP ABSOLUTE 2a 02		// Ram content at that position is:  9d STA ABS_X 8c d0;  ca DEX IMPLIED; 60 RTS IMPLIED;
+ff95 20 JSR ABSOLUTE 2d bf 
+ff98 4c JMP ABSOLUTE 9e ff 
+ff9b 20 JSR ABSOLUTE 36 f8		// Print line
+ff9e 48 PHA IMPLIED 
+ff9f ad LDA ABSOLUTE 05 02 
+ffa2 f0 BEQ RELATIVE 17 
+ffa4 68 PLA IMPLIED 
+ffa5 20 JSR ABSOLUTE b1 fc 
+ffa8 c9 CMP IMMEDIATE 0d 
+ffaa d0 BNE RELATIVE 10 
+ffac 48 PHA IMPLIED 
+ffad 8a TXA IMPLIED 
+ffae 48 PHA IMPLIED 
+ffaf a2 LDX IMMEDIATE 0a 
+ffb1 a9 LDA IMMEDIATE 00 
+ffb3 20 JSR ABSOLUTE b1 fc 
+ffb6 ca DEX IMPLIED 
+ffb7 d0 BNE RELATIVE fa 
+ffb9 68 PLA IMPLIED 
+ffba aa TAX IMPLIED 
+ffbb 68 PLA IMPLIED 
+ffbc 60 RTS IMPLIED 
+ffbd 20 JSR ABSOLUTE a6 f9 
+ffc0 20 JSR ABSOLUTE e0 fb 
+ffc3 a2 LDX IMMEDIATE 03 
+ffc5 20 JSR ABSOLUTE b1 f9 
+ffc8 a5 LDA ZERO_PAGE fc 
+ffca a6 LDX ZERO_PAGE fd 
+ffcc 85 STA ZERO_PAGE e4 
+ffce 86 STX ZERO_PAGE e5 
+ffd0 60 RTS IMPLIED 
+ffd1 a2 LDX IMMEDIATE 02 
+ffd3 bd LDA ABS_X 22 02 
+ffd6 9d STA ABS_X 27 02 
+ffd9 9d STA ABS_X 2a 02 
+ffdc ca DEX IMPLIED 
+ffdd d0 BNE RELATIVE f4 
+ffdf 60 RTS IMPLIED 
+ffe0 4d EOR ABSOLUTE 2f 01 
+ffe3 a9 LDA IMMEDIATE 2e 
+ffe5 20 JSR ABSOLUTE ee ff 
+ffe8 4c JMP ABSOLUTE b6 fe 
+ffeb 6c JMP INDIRECT 18 02 
+ffee 6c JMP INDIRECT 1a 02 
+fff1 6c JMP INDIRECT 1c 02 
+fff4 6c JMP INDIRECT 1e 02 
+fff7 6c JMP INDIRECT 20 02 
+fffa 30 BMI RELATIVE 01 
+fffc 00 BRK IMPLIED         // Reset vector
+fffd ff???  
+fffe c0 CPY IMMEDIATE 01    // IRQ vector
+FFFF 01                     

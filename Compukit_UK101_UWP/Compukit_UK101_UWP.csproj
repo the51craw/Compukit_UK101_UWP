@@ -1,0 +1,444 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{74200E8F-DED4-42C2-925B-D5D7D561A4CE}</ProjectGuid>
+    <OutputType>AppContainerExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Compukit_UK101_UWP</RootNamespace>
+    <AssemblyName>Compukit_UK101_UWP</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
+    <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <OutputPath>bin\ARM\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'">
+    <OutputPath>bin\ARM64\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="C6502Assembler.cs" />
+    <Compile Include="CACIA.cs" />
+    <Compile Include="CClock.cs" />
+    <Compile Include="CKeyboard.cs" />
+    <Compile Include="CMemoryBus.cs" />
+    <Compile Include="CMemoryBusDevice.cs" />
+    <Compile Include="Common.cs" />
+    <Compile Include="CRAM.cs" />
+    <Compile Include="CSignetic6502.cs" />
+    <Compile Include="CVDU.cs" />
+    <Compile Include="HBClasses.cs" />
+    <Compile Include="KeyboardMatrix.cs" />
+    <Compile Include="MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ROMs\8000.cs" />
+    <Compile Include="SysROMs\BASIC1.cs" />
+    <Compile Include="SysROMs\BASIC2.cs" />
+    <Compile Include="SysROMs\BASIC3.cs" />
+    <Compile Include="SysROMs\BASIC4.cs" />
+    <Compile Include="SysROMs\MONITOR.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\char_000.png" />
+    <Content Include="Images\char_001.png" />
+    <Content Include="Images\char_002.png" />
+    <Content Include="Images\char_003.png" />
+    <Content Include="Images\char_004.png" />
+    <Content Include="Images\char_005.png" />
+    <Content Include="Images\char_006.png" />
+    <Content Include="Images\char_007.png" />
+    <Content Include="Images\char_008.png" />
+    <Content Include="Images\char_009.png" />
+    <Content Include="Images\char_010.png" />
+    <Content Include="Images\char_011.png" />
+    <Content Include="Images\char_012.png" />
+    <Content Include="Images\char_013.png" />
+    <Content Include="Images\char_014.png" />
+    <Content Include="Images\char_015.png" />
+    <Content Include="Images\char_016.png" />
+    <Content Include="Images\char_017.png" />
+    <Content Include="Images\char_018.png" />
+    <Content Include="Images\char_019.png" />
+    <Content Include="Images\char_020.png" />
+    <Content Include="Images\char_021.png" />
+    <Content Include="Images\char_022.png" />
+    <Content Include="Images\char_023.png" />
+    <Content Include="Images\char_024.png" />
+    <Content Include="Images\char_025.png" />
+    <Content Include="Images\char_026.png" />
+    <Content Include="Images\char_027.png" />
+    <Content Include="Images\char_028.png" />
+    <Content Include="Images\char_029.png" />
+    <Content Include="Images\char_030.png" />
+    <Content Include="Images\char_031.png" />
+    <Content Include="Images\char_032.png" />
+    <Content Include="Images\char_033.png" />
+    <Content Include="Images\char_034.png" />
+    <Content Include="Images\char_035.png" />
+    <Content Include="Images\char_036.png" />
+    <Content Include="Images\char_037.png" />
+    <Content Include="Images\char_038.png" />
+    <Content Include="Images\char_039.png" />
+    <Content Include="Images\char_040.png" />
+    <Content Include="Images\char_041.png" />
+    <Content Include="Images\char_042.png" />
+    <Content Include="Images\char_043.png" />
+    <Content Include="Images\char_044.png" />
+    <Content Include="Images\char_045.png" />
+    <Content Include="Images\char_046.png" />
+    <Content Include="Images\char_047.png" />
+    <Content Include="Images\char_048.png" />
+    <Content Include="Images\char_049.png" />
+    <Content Include="Images\char_050.png" />
+    <Content Include="Images\char_051.png" />
+    <Content Include="Images\char_052.png" />
+    <Content Include="Images\char_053.png" />
+    <Content Include="Images\char_054.png" />
+    <Content Include="Images\char_055.png" />
+    <Content Include="Images\char_056.png" />
+    <Content Include="Images\char_057.png" />
+    <Content Include="Images\char_058.png" />
+    <Content Include="Images\char_059.png" />
+    <Content Include="Images\char_060.png" />
+    <Content Include="Images\char_061.png" />
+    <Content Include="Images\char_062.png" />
+    <Content Include="Images\char_063.png" />
+    <Content Include="Images\char_064.png" />
+    <Content Include="Images\char_065.png" />
+    <Content Include="Images\char_066.png" />
+    <Content Include="Images\char_067.png" />
+    <Content Include="Images\char_068.png" />
+    <Content Include="Images\char_069.png" />
+    <Content Include="Images\char_070.png" />
+    <Content Include="Images\char_071.png" />
+    <Content Include="Images\char_072.png" />
+    <Content Include="Images\char_073.png" />
+    <Content Include="Images\char_074.png" />
+    <Content Include="Images\char_075.png" />
+    <Content Include="Images\char_076.png" />
+    <Content Include="Images\char_077.png" />
+    <Content Include="Images\char_078.png" />
+    <Content Include="Images\char_079.png" />
+    <Content Include="Images\char_080.png" />
+    <Content Include="Images\char_081.png" />
+    <Content Include="Images\char_082.png" />
+    <Content Include="Images\char_083.png" />
+    <Content Include="Images\char_084.png" />
+    <Content Include="Images\char_085.png" />
+    <Content Include="Images\char_086.png" />
+    <Content Include="Images\char_087.png" />
+    <Content Include="Images\char_088.png" />
+    <Content Include="Images\char_089.png" />
+    <Content Include="Images\char_090.png" />
+    <Content Include="Images\char_091.png" />
+    <Content Include="Images\char_092.png" />
+    <Content Include="Images\char_093.png" />
+    <Content Include="Images\char_094.png" />
+    <Content Include="Images\char_095.png" />
+    <Content Include="Images\char_096.png" />
+    <Content Include="Images\char_097.png" />
+    <Content Include="Images\char_098.png" />
+    <Content Include="Images\char_099.png" />
+    <Content Include="Images\char_100.png" />
+    <Content Include="Images\char_101.png" />
+    <Content Include="Images\char_102.png" />
+    <Content Include="Images\char_103.png" />
+    <Content Include="Images\char_104.png" />
+    <Content Include="Images\char_105.png" />
+    <Content Include="Images\char_106.png" />
+    <Content Include="Images\char_107.png" />
+    <Content Include="Images\char_108.png" />
+    <Content Include="Images\char_109.png" />
+    <Content Include="Images\char_110.png" />
+    <Content Include="Images\char_111.png" />
+    <Content Include="Images\char_112.png" />
+    <Content Include="Images\char_113.png" />
+    <Content Include="Images\char_114.png" />
+    <Content Include="Images\char_115.png" />
+    <Content Include="Images\char_116.png" />
+    <Content Include="Images\char_117.png" />
+    <Content Include="Images\char_118.png" />
+    <Content Include="Images\char_119.png" />
+    <Content Include="Images\char_120.png" />
+    <Content Include="Images\char_121.png" />
+    <Content Include="Images\char_122.png" />
+    <Content Include="Images\char_123.png" />
+    <Content Include="Images\char_124.png" />
+    <Content Include="Images\char_125.png" />
+    <Content Include="Images\char_126.png" />
+    <Content Include="Images\char_127.png" />
+    <Content Include="Images\char_128.png" />
+    <Content Include="Images\char_129.png" />
+    <Content Include="Images\char_130.png" />
+    <Content Include="Images\char_131.png" />
+    <Content Include="Images\char_132.png" />
+    <Content Include="Images\char_133.png" />
+    <Content Include="Images\char_134.png" />
+    <Content Include="Images\char_135.png" />
+    <Content Include="Images\char_136.png" />
+    <Content Include="Images\char_137.png" />
+    <Content Include="Images\char_138.png" />
+    <Content Include="Images\char_139.png" />
+    <Content Include="Images\char_140.png" />
+    <Content Include="Images\char_141.png" />
+    <Content Include="Images\char_142.png" />
+    <Content Include="Images\char_143.png" />
+    <Content Include="Images\char_144.png" />
+    <Content Include="Images\char_145.png" />
+    <Content Include="Images\char_146.png" />
+    <Content Include="Images\char_147.png" />
+    <Content Include="Images\char_148.png" />
+    <Content Include="Images\char_149.png" />
+    <Content Include="Images\char_150.png" />
+    <Content Include="Images\char_151.png" />
+    <Content Include="Images\char_152.png" />
+    <Content Include="Images\char_153.png" />
+    <Content Include="Images\char_154.png" />
+    <Content Include="Images\char_155.png" />
+    <Content Include="Images\char_156.png" />
+    <Content Include="Images\char_157.png" />
+    <Content Include="Images\char_158.png" />
+    <Content Include="Images\char_159.png" />
+    <Content Include="Images\char_160.png" />
+    <Content Include="Images\char_161.png" />
+    <Content Include="Images\char_162.png" />
+    <Content Include="Images\char_163.png" />
+    <Content Include="Images\char_164.png" />
+    <Content Include="Images\char_165.png" />
+    <Content Include="Images\char_166.png" />
+    <Content Include="Images\char_167.png" />
+    <Content Include="Images\char_168.png" />
+    <Content Include="Images\char_169.png" />
+    <Content Include="Images\char_170.png" />
+    <Content Include="Images\char_171.png" />
+    <Content Include="Images\char_172.png" />
+    <Content Include="Images\char_173.png" />
+    <Content Include="Images\char_174.png" />
+    <Content Include="Images\char_175.png" />
+    <Content Include="Images\char_176.png" />
+    <Content Include="Images\char_177.png" />
+    <Content Include="Images\char_178.png" />
+    <Content Include="Images\char_179.png" />
+    <Content Include="Images\char_180.png" />
+    <Content Include="Images\char_181.png" />
+    <Content Include="Images\char_182.png" />
+    <Content Include="Images\char_183.png" />
+    <Content Include="Images\char_184.png" />
+    <Content Include="Images\char_185.png" />
+    <Content Include="Images\char_186.png" />
+    <Content Include="Images\char_187.png" />
+    <Content Include="Images\char_188.png" />
+    <Content Include="Images\char_189.png" />
+    <Content Include="Images\char_190.png" />
+    <Content Include="Images\char_191.png" />
+    <Content Include="Images\char_192.png" />
+    <Content Include="Images\char_193.png" />
+    <Content Include="Images\char_194.png" />
+    <Content Include="Images\char_195.png" />
+    <Content Include="Images\char_196.png" />
+    <Content Include="Images\char_197.png" />
+    <Content Include="Images\char_198.png" />
+    <Content Include="Images\char_199.png" />
+    <Content Include="Images\char_200.png" />
+    <Content Include="Images\char_201.png" />
+    <Content Include="Images\char_202.png" />
+    <Content Include="Images\char_203.png" />
+    <Content Include="Images\char_204.png" />
+    <Content Include="Images\char_205.png" />
+    <Content Include="Images\char_206.png" />
+    <Content Include="Images\char_207.png" />
+    <Content Include="Images\char_208.png" />
+    <Content Include="Images\char_209.png" />
+    <Content Include="Images\char_210.png" />
+    <Content Include="Images\char_211.png" />
+    <Content Include="Images\char_212.png" />
+    <Content Include="Images\char_213.png" />
+    <Content Include="Images\char_214.png" />
+    <Content Include="Images\char_215.png" />
+    <Content Include="Images\char_216.png" />
+    <Content Include="Images\char_217.png" />
+    <Content Include="Images\char_218.png" />
+    <Content Include="Images\char_219.png" />
+    <Content Include="Images\char_220.png" />
+    <Content Include="Images\char_221.png" />
+    <Content Include="Images\char_222.png" />
+    <Content Include="Images\char_223.png" />
+    <Content Include="Images\char_224.png" />
+    <Content Include="Images\char_225.png" />
+    <Content Include="Images\char_226.png" />
+    <Content Include="Images\char_227.png" />
+    <Content Include="Images\char_228.png" />
+    <Content Include="Images\char_229.png" />
+    <Content Include="Images\char_230.png" />
+    <Content Include="Images\char_231.png" />
+    <Content Include="Images\char_232.png" />
+    <Content Include="Images\char_233.png" />
+    <Content Include="Images\char_234.png" />
+    <Content Include="Images\char_235.png" />
+    <Content Include="Images\char_236.png" />
+    <Content Include="Images\char_237.png" />
+    <Content Include="Images\char_238.png" />
+    <Content Include="Images\char_239.png" />
+    <Content Include="Images\char_240.png" />
+    <Content Include="Images\char_241.png" />
+    <Content Include="Images\char_242.png" />
+    <Content Include="Images\char_243.png" />
+    <Content Include="Images\char_244.png" />
+    <Content Include="Images\char_245.png" />
+    <Content Include="Images\char_246.png" />
+    <Content Include="Images\char_247.png" />
+    <Content Include="Images\char_248.png" />
+    <Content Include="Images\char_249.png" />
+    <Content Include="Images\char_250.png" />
+    <Content Include="Images\char_251.png" />
+    <Content Include="Images\char_252.png" />
+    <Content Include="Images\char_253.png" />
+    <Content Include="Images\char_254.png" />
+    <Content Include="Images\char_255.png" />
+    <Content Include="Properties\Default.rd.xml" />
+    <Content Include="Assets\LockScreenLogo.scale-200.png" />
+    <Content Include="Assets\SplashScreen.scale-200.png" />
+    <Content Include="Assets\Square150x150Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Content Include="Assets\StoreLogo.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
+      <Version>6.2.8</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SysROMs\Keyboard.map" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
+    <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
