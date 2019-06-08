@@ -1,7 +1,7 @@
 # Compukit_UK101_UWP
 Emulator for an early personal computer, the UK101 from Compukit LTD featuring 
 machine code monitor CEGMON © 1980 George Chkiantz, Richard Elen, Tom Graves, 
-8K Basic by Microsoft and a MIDI implementation by me (written in machine code). 
+8K Basic © 1979 Microsoft and a MIDI implementation by me (written in machine code). 
 
 This code may only be used if you already own a UK101 computer. If you do not, 
 you will violate the access rights regarding the CEGMON and 8K Basic softwares.
