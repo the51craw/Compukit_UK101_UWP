@@ -70,7 +70,7 @@ namespace Compukit_UK101_UWP
                     //image.WidthRequest = 500;
                     Grid.SetColumn(image, col);
                     Grid.SetRow(image, row);
-                    gridScreen.Children.Add(image);
+                    gridScreen.Children.Insert(row * 64 + col, image);
                 }
             }
         }
@@ -95,7 +95,9 @@ namespace Compukit_UK101_UWP
                 Int32 position = Address.W - StartsAt.W;
                 Grid.SetColumn(image, position % 64);
                 Grid.SetRow(image, position / 64);
-                gridScreen.Children.Add(image);
+                gridScreen.Children.RemoveAt(position);
+                gridScreen.Children.Insert(position, image);
+                image = null;
                 return true;
             }
             else

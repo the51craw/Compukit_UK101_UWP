@@ -118,6 +118,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Basic\LoadAndRunTest.cs" />
+    <Compile Include="Basic\tapes_1Basic_0.cs" />
     <Compile Include="C6502Assembler.cs" />
     <Compile Include="CACIA.cs" />
     <Compile Include="CClock.cs" />

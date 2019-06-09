@@ -63,10 +63,13 @@ namespace Compukit_UK101_UWP
         bool LogFlag;
         bool LogEnter;
 
-        public CSignetic6502()
+        private MainPage mainPage;
+
+        public CSignetic6502(MainPage mainPage)
         {
+            this.mainPage = mainPage;
             AddressInEffect = new Address();
-            MemoryBus = new CMemoryBus();
+            MemoryBus = new CMemoryBus(mainPage);
             LogFlag = false;
             LogEnter = false;
             PC = new Address();

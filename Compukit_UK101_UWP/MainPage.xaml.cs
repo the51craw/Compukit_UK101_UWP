@@ -40,7 +40,7 @@ namespace Compukit_UK101_UWP
         }
         private void Init()
         {
-            CSignetic6502 = new CSignetic6502();
+            CSignetic6502 = new CSignetic6502(mainPage);
             CSignetic6502.MemoryBus.VDU.InitCVDU(this, gridScreen);
             CClock = new CClock(this);
             keystate = Window.Current.CoreWindow.GetKeyState(VirtualKey.NumberKeyLock);

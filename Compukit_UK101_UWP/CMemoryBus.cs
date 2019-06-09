@@ -6,7 +6,7 @@ namespace Compukit_UK101_UWP
 {
     public class CMemoryBus
     {
-        public const Int32 DEVICES_MAX = 9;
+        public const Int32 DEVICES_MAX = 10;
         public byte DeviceIndex;
         public CMemoryBusDevice[] Device = new CMemoryBusDevice[DEVICES_MAX];
         public Address Address { get; set; }
@@ -23,8 +23,11 @@ namespace Compukit_UK101_UWP
         public CACIA ACIA;
         public ROM8000 ROM8000;
 
-        public CMemoryBus()
+        private MainPage mainPage;
+
+        public CMemoryBus(MainPage mainPage)
         {
+            this.mainPage = mainPage;
             int i;
 
             //Address = new Address();
@@ -92,10 +95,10 @@ namespace Compukit_UK101_UWP
             Device[i++] = VDU;
 
             // Setup ACIA:
-            //ACIA.StartsAt.W = 0xF000;
-            ////	ACIA.EndsAt.W = 0xF0FF;
-            //ACIA.EndsAt.W = 0xF001;
-            //Device[i++] = &ACIA;
+            ACIA = new CACIA(mainPage);
+            ACIA.StartsAt.W = 0xF000;
+            ACIA.EndsAt.W = 0xF0FF;
+            Device[i++] = ACIA;
 
             // Look for ROMs in folder ROMs:
             ROM8000 = new ROM8000(Address);
@@ -120,6 +123,10 @@ namespace Compukit_UK101_UWP
             if (Address.W >= 0xf800)
             {
                 return 4;
+            }
+            else if (Address.W >= 0xf000)
+            {
+                return 8;
             }
             else if (Address.W >= 0xdf00)
             {
@@ -147,7 +154,7 @@ namespace Compukit_UK101_UWP
             }
             else if (Address.W >= 0x8000)
             {
-                return 8;
+                return 9;
             }
             else
             {
@@ -200,43 +207,40 @@ namespace Compukit_UK101_UWP
             // Unavailable address spaces return H as data in the real hardware:
             byte OutData = (byte)Address.H;
 
-            //for (Int32 i = 0; i < DEVICES_MAX; i++)
-            //{
-            //    if (Device[i].Selected)
-            //    {
-                    switch (DeviceIndex)
-                    {
-                        case 0:
-                            OutData = Basic1.Read();
-                            break;
-                        case 1:
-                            OutData = Basic2.Read();
-                            break;
-                        case 2:
-                            OutData = Basic3.Read();
-                            break;
-                        case 3:
-                            OutData = Basic4.Read();
-                            break;
-                        case 4:
-                            //OutData = Monitor.pData[Address.W - Monitor.StartsAt.W];
-                            OutData = Monitor.Read();
-                            break;
-                        case 5:
-                            OutData = RAM.Read();
-                            break;
-                        case 6:
-                            OutData = Keyboard.Read();
-                            break;
-                        case 7:
-                            OutData = VDU.Read();
-                            break;
-                        case 8:
-                            OutData = ROM8000.Read();
-                            break;
-                    }
-            //    }
-            //}
+            switch (DeviceIndex)
+            {
+                case 0:
+                    OutData = Basic1.Read();
+                    break;
+                case 1:
+                    OutData = Basic2.Read();
+                    break;
+                case 2:
+                    OutData = Basic3.Read();
+                    break;
+                case 3:
+                    OutData = Basic4.Read();
+                    break;
+                case 4:
+                    //OutData = Monitor.pData[Address.W - Monitor.StartsAt.W];
+                    OutData = Monitor.Read();
+                    break;
+                case 5:
+                    OutData = RAM.Read();
+                    break;
+                case 6:
+                    OutData = Keyboard.Read();
+                    break;
+                case 7:
+                    OutData = VDU.Read();
+                    break;
+                case 8:
+                    OutData = ACIA.Read();
+                    break;
+                case 9:
+                    OutData = ROM8000.Read();
+                    break;
+            }
 
             return OutData;
         }

@@ -26,7 +26,7 @@
             <Button Grid.Column="3" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="License_Click" />
         </Grid>
         <Grid  Grid.Row="1">
-            <Grid x:Name="gridScreen" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gray" />
+            <Grid x:Name="gridScreen" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" />
         </Grid>
         <Grid  Grid.Row="1">
             <Grid x:Name="gridFile" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
