@@ -20,6 +20,7 @@ namespace Compukit_UK101_UWP
         public const byte IO_MODE_6820_FILE = 1; // Use filesystem
         public const byte IO_MODE_6820_MIDI = 2; // Use a MIDI interface
         public const byte IO_MODE_6820_TAPE = 4; // Use internal classes
+        public const byte IO_MODE_6820_SERIAL = 8; // Use serial interface
 
         // Status register flags:
         const byte ACIA_STATUS_IRQ = 0x80; // ACIA wishes to interrupt processor
@@ -61,6 +62,10 @@ namespace Compukit_UK101_UWP
                         SetFlag(ACIA_STATUS_TDRE);   // Will be kept low a few ms by timer after data sent
                         break;
                     case IO_MODE_6820_FILE:
+                        outStream = new MemoryStream();
+                        SetFlag(ACIA_STATUS_TDRE);   // Will be kept low all time
+                        break;
+                    case IO_MODE_6820_SERIAL:
                         outStream = new MemoryStream();
                         SetFlag(ACIA_STATUS_TDRE);   // Will be kept low all time
                         break;
@@ -157,6 +162,8 @@ namespace Compukit_UK101_UWP
                         return midiBuffer[outpointer++];
                     case IO_MODE_6820_FILE:
                         return 0xff;
+                    case IO_MODE_6820_SERIAL:
+                        return 0xff;
                     default:
                         return 0xff;
                 }
@@ -188,6 +195,9 @@ namespace Compukit_UK101_UWP
                         }
                     case IO_MODE_6820_FILE:
                         return ACIAStatus;
+                    case IO_MODE_6820_SERIAL:
+                        return ACIAStatus;
+                        break;
                     default:
                         return 0;
                 }
@@ -210,6 +220,9 @@ namespace Compukit_UK101_UWP
                         mainPage.Midi.midiOutPort.SendBuffer(ibuffer);
                         break;
                     case IO_MODE_6820_FILE:
+                        outStream.WriteByte(InData);
+                        break;
+                    case IO_MODE_6820_SERIAL:
                         outStream.WriteByte(InData);
                         break;
                 }

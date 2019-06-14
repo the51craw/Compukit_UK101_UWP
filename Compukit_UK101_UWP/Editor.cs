@@ -22,6 +22,8 @@ namespace Compukit_UK101_UWP
         public string SourceCode { get; set; }
         public string Name { get; set; }
 
+        private List<byte> objectBytes;
+
         private string[] notes = new string[]
         {
             "C0 ","C#0 ","D0 ","D#0 ","E0 ","Fb0 ","F0 ","G0 ","G#0 ","A0 ","Bb0 ","B0 ",
@@ -34,6 +36,7 @@ namespace Compukit_UK101_UWP
         public Part()
         {
             SourceCode = "";
+            objectBytes = new List<byte>();
         }
 
         public void Add(byte[] o)
@@ -50,24 +53,48 @@ namespace Compukit_UK101_UWP
         public string Decompile()
         {
             string result = "";
-            if (ObjectCode != null && ObjectCode.Length > 0)
+            byte b;
+            UInt16 ticks;
+
+            CombineBytes();
+
+            if (objectBytes != null && objectBytes.Count() > 0)
             {
-                for (int i = 0; i < ObjectCode.Length; i++)
+                int i = 0;
+                while (i < objectBytes.Count())
                 {
-                    if ((ObjectCode[i] & 0xc0) == 0xc0)
+                    if (objectBytes[i] == 0x3a)
                     {
-                        result += AddPause(i);
+                        result += ": ";
+                        i++;
                     }
                     else
                     {
-                        if ((ObjectCode[i] & 0x80) == 0x80)
+                        if (objectBytes[i] > 0xce)
+                        {
+                            // One or more pauses
+                            ticks = 0;
+                            while (objectBytes[i] > 0xce)
+                            {
+                                ticks += ((byte)(objectBytes[i++] - 0xcf));
+                            }
+                            result += AddPause(ticks);
+                        }
+                        if (objectBytes[i] > 0x90)
                         {
                             // Note on
-                            result += AddNoteOn((byte)(ObjectCode[i] & 0x80));
+                            result += AddNoteOn((byte)(objectBytes[i] - 0x91));
+                            i++;
+                        }
+                        else if (objectBytes[i] > 0x52)
+                        {
+                            // Note off
+                            result += AddNoteOff((byte)(objectBytes[i] - 0x53));
+                            i++;
                         }
                         else
                         {
-                            result += AddNoteOff((byte)(ObjectCode[i] & 0x80));
+                            i++;
                         }
                     }
                 }
@@ -75,143 +102,99 @@ namespace Compukit_UK101_UWP
             return result;
         }
 
-        private String AddPause(Int32 i)
+        private void CombineBytes()
         {
-            byte b;
-            UInt16 ticks;
-            UInt32 pauseVal;
+            if (ObjectCode != null && ObjectCode.Length > 0)
+            {
+                for (int i = 0; i < ObjectCode.Length; i++)
+                {
+                    if (!(ObjectCode[i] == 0x0d || ObjectCode[i] == 0x0a))
+                    {
+                        if (ObjectCode[i] == 0x3a)
+                        {
+                            objectBytes.Add(ObjectCode[i]);
+                        }
+                        else
+                        {
+                            if ((ObjectCode[i] & 0xf0) == 0x40 && (ObjectCode[i + 1] & 0xf0) == 0x40)
+                            {
+                                // One byte is combined by two bytes with high nibble = 4.
+                                // If we came here, we must also get the next byte and 
+                                // put the low nibbles together into the byte in effect.
+                                objectBytes.Add((byte)(((ObjectCode[i++] & 0x0f) << 4) | (ObjectCode[i] & 0x0f)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private String AddPause(UInt16 pauseVal)
+        {
+            //byte b;
+            //UInt32 pauseVal;
             String s = "";
 
             // Pause, strip of bit 7 and 6:
-            b = (byte)(ObjectCode[i] & 0x3f);
             // 0x0e is 1/4 note, what about the rest?
             // Assuming that it is relative, one 1/4 note
             // is 14 'ticks' and a 'tick' is 1/56 note.
             // However, MIDI has 96 ticks per 1/4 note,
             // so let's convert to MIDI ticks:
-            ticks = (UInt16)(6 * (b + 2));
+            //ticks = (UInt16)(6 * (b + 2));
 
-            // Also note that multiple pauses might be
-            // present, so look ahead for more while b = 0xff:
-            pauseVal = ticks;
-            while (((byte)(ObjectCode[i + 1]) & 0xc0) == 0xc0)
-            {
-                i++;
-                b = (byte)(b & 0x3f);
-                ticks = (UInt16)(6 * (b + 2));
-                pauseVal += (UInt32)ticks;
-            }
+            //// Also note that multiple pauses might be
+            //// present, so look ahead for more while b = 0xff:
+            //pauseVal = ticks;
+            //while (((byte)(ObjectCode[i + 1]) & 0xc0) == 0xc0)
+            //{
+            //    i++;
+            //    b = (byte)(b & 0x3f);
+            //    ticks = (UInt16)(6 * (b + 2));
+            //    pauseVal += (UInt32)ticks;
+            //}
+
+            // 0 - 32, 16 = 1/4 note
+            /*
+             * 1 = 1/64
+             * 2 = 1/32
+             * 4 = 1/16
+             * 8 = 1/8
+             * 16 = 1/4
+             * 32 = 1/2
+             */
+
             while (pauseVal > 1)
             {
-                if (pauseVal >= 384)
-                {
-                    pauseVal -= 384;
-                    s += "P1 ";
-                }
-                else if (pauseVal >= 288)
-                {
-                    pauseVal -= 288;
-                    s += "P2. ";
-                }
-                else if (pauseVal >= 192)
-                {
-                    pauseVal -= 192;
-                    s += "P2 ";
-                }
-                else if (pauseVal >= 128)
-                {
-                    pauseVal -= 128;
-                    s += "P2T ";
-                }
-                else if (pauseVal >= 144)
-                {
-                    pauseVal -= 144;
-                    s += "P4. ";
-                }
-                else if (pauseVal >= 96)
-                {
-                    pauseVal -= 96;
-                    s += "P4 ";
-                }
-                else if (pauseVal >= 72)
-                {
-                    pauseVal -= 72;
-                    s += "P8. ";
-                }
-                else if (pauseVal >= 64)
-                {
-                    pauseVal -= 64;
-                    s += "P4T ";
-                }
-                else if (pauseVal >= 48)
-                {
-                    pauseVal -= 48;
-                    s += "P8 ";
-                }
-                else if (pauseVal >= 36)
-                {
-                    pauseVal -= 36;
-                    s += "P16. ";
-                }
-                else if (pauseVal >= 32)
+                if (pauseVal >= 32)
                 {
                     pauseVal -= 32;
-                    s += "P8T ";
-                }
-                else if (pauseVal >= 24)
-                {
-                    pauseVal -= 24;
-                    s += "P16 ";
-                }
-                else if (pauseVal >= 18)
-                {
-                    pauseVal -= 18;
-                    s += "P32. ";
+                    s += "P2 ";
                 }
                 else if (pauseVal >= 16)
                 {
                     pauseVal -= 16;
-                    s += "P16T ";
-                }
-                else if (pauseVal >= 12)
-                {
-                    pauseVal -= 12;
-                    s += "P32 ";
-                }
-                else if (pauseVal >= 9)
-                {
-                    pauseVal -= 9;
-                    s += "P64. ";
+                    s += "P4 ";
                 }
                 else if (pauseVal >= 8)
                 {
                     pauseVal -= 8;
-                    s += "P32T ";
-                }
-                else if (pauseVal >= 6)
-                {
-                    pauseVal -= 6;
-                    s += "P64 ";
+                    s += "P8 ";
                 }
                 else if (pauseVal >= 4)
                 {
                     pauseVal -= 4;
-                    s += "P64T ";
-                }
-                else if (pauseVal >= 3)
-                {
-                    pauseVal -= 3;
-                    s += "P128 ";
+                    s += "P16 ";
                 }
                 else if (pauseVal >= 2)
                 {
                     pauseVal -= 2;
-                    s += "P128T ";
+                    s += "P32 ";
                 }
                 else if (pauseVal >= 1)
                 {
                     pauseVal -= 1;
-                    s += "P256T ";
+                    s += "P64 ";
                 }
             }
             return s;
@@ -219,16 +202,21 @@ namespace Compukit_UK101_UWP
 
         private String AddNoteOn(byte b)
         {
-            // Note 0 = C0, 1 = C#0 etc
-            return notes[b];
+            try
+            {
+                return "+" + notes[b];
+            }
+            catch
+            {
+                return "Byte in error: " + b.ToString() + " ";
+            }
         }
 
         private String AddNoteOff(byte b)
         {
             try
             {
-                b -= 0x3e;
-                return notes[b];
+                return "-" + notes[b];
             }
             catch
             {

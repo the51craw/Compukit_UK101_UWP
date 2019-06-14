@@ -30,6 +30,7 @@
             <ComboBox Grid.Column ="1" x:Name="cbSelectACIAUsage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectACIAUsage_SelectionChanged" >
                 <x:String>File save/load</x:String>
                 <x:String>MIDI</x:String>
+                <x:String>Tape cassette</x:String>
                 <x:String>Serial port</x:String>
             </ComboBox>
             <ComboBox Grid.Column ="2" x:Name="cbSelectMIDIInputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIInputDevice_SelectionChanged"  />

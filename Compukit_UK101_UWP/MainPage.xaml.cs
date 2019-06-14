@@ -182,7 +182,6 @@ namespace Compukit_UK101_UWP
                         if (cbSelectMIDIInputDevice.Items.Count() > 0)
                         {
                             cbSelectMIDIInputDevice.SelectedIndex = 0;
-                            await Midi.InitInput((String)cbSelectMIDIInputDevice.SelectedItem);
                         }
 
                         foreach (string device in Midi.MidiOutputDevices)
@@ -193,7 +192,6 @@ namespace Compukit_UK101_UWP
                         if (cbSelectMIDIOutputDevice.Items.Count() > 0)
                         {
                             cbSelectMIDIOutputDevice.SelectedIndex = 0;
-                            await Midi.InitOutput((String)cbSelectMIDIOutputDevice.SelectedItem);
                         }
                     }
                     break;
@@ -209,7 +207,7 @@ namespace Compukit_UK101_UWP
             Midi.ResetMidiInput();
             if (cbSelectMIDIInputDevice != null && cbSelectMIDIInputDevice.SelectedIndex > -1)
             {
-                await Midi.InitInput((string)cbSelectMIDIInputDevice.SelectedItem);
+                await Midi.InitInput(((string)cbSelectMIDIInputDevice.SelectedItem).Replace("In: ", ""));
                 //btnEmulator.Focus(FocusState.Programmatic);
             }
         }
@@ -219,7 +217,7 @@ namespace Compukit_UK101_UWP
             Midi.ResetMidiOutput();
             if (cbSelectMIDIOutputDevice != null && cbSelectMIDIOutputDevice.SelectedIndex > -1)
             {
-                await Midi.InitOutput((string)cbSelectMIDIOutputDevice.SelectedItem);
+                await Midi.InitOutput(((string)cbSelectMIDIOutputDevice.SelectedItem).Replace("Out: ", ""));
                 //btnEmulator.Focus(FocusState.Programmatic);
             }
         }

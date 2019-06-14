@@ -62,10 +62,11 @@ namespace Compukit_UK101_UWP
         {
             try
             {
-                if (midiOutPort != null)
+                if (midiInPort != null)
                 {
-                    midiOutPort.Dispose();
-                    midiOutPort = null;
+                    midiInPort.MessageReceived -= MidiInPort_MessageReceived;
+                    midiInPort.Dispose();
+                    midiInPort = null;
                     GC.Collect();
                 }
             }
@@ -76,10 +77,10 @@ namespace Compukit_UK101_UWP
         {
             try
             {
-                if (midiInPort != null)
+                if (midiOutPort != null)
                 {
-                    midiInPort.Dispose();
-                    midiInPort = null;
+                    midiOutPort.Dispose();
+                    midiOutPort = null;
                     GC.Collect();
                 }
             }
@@ -109,8 +110,7 @@ namespace Compukit_UK101_UWP
             {
                 System.Diagnostics.Debug.WriteLine("Unable to create MidiInPort from input device");
             }
-
-            if (MidiIsReady())
+            else
             {
                 midiInPort.MessageReceived += MidiInPort_MessageReceived;
             }
@@ -130,14 +130,14 @@ namespace Compukit_UK101_UWP
                 }
             }
 
-            if (midiOutPort == null)
-            {
-                System.Diagnostics.Debug.WriteLine("Unable to create MidiOutPort from output device");
-            }
-
             if (midiOutDevInfo != null)
             {
                 midiOutPort = await MidiOutPort.FromIdAsync(midiOutDevInfo.Id);
+            }
+
+            if (midiOutPort == null)
+            {
+                System.Diagnostics.Debug.WriteLine("Unable to create MidiOutPort from output device");
             }
         }
 
