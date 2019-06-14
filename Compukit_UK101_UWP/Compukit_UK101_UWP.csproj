@@ -130,11 +130,13 @@
     <Compile Include="CRAM.cs" />
     <Compile Include="CSignetic6502.cs" />
     <Compile Include="CVDU.cs" />
+    <Compile Include="Editor.cs" />
     <Compile Include="HBClasses.cs" />
     <Compile Include="KeyboardMatrix.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MIDI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ROMs\8000.cs" />
     <Compile Include="SysROMs\BASIC1.cs" />

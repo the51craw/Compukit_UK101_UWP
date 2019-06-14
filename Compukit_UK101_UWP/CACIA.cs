@@ -1,27 +1,35 @@
-﻿using Compukit_UK101_UWP.Basic;
+﻿using Compukit_UK101_UWP;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 
 namespace Compukit_UK101_UWP
 {
+    /**
+     * A0 = RS
+     * A0 = 0 Read = Read status,  Write = Write command.
+     * A0 = 1 Read = Read received data, Write = Send data
+     */
     public class CACIA : CMemoryBusDevice
     {
         // I/O modes:
-        const byte IO_MODE_6820_FILE = 1; // Use filesystem
-        const byte IO_MODE_6820_MIDI = 2; // Use a MIDI interface
-        const byte IO_MODE_6820_TAPE = 4; // Use internal classes
+        public const byte IO_MODE_6820_FILE = 1; // Use filesystem
+        public const byte IO_MODE_6820_MIDI = 2; // Use a MIDI interface
+        public const byte IO_MODE_6820_TAPE = 4; // Use internal classes
 
         // Status register flags:
-        const byte ACIA_STATUS_IRQ  = 0x80; // ACIA wishes to interrupt processor
-        const byte ACIA_STATUS_PE   = 0x40; // A parity error has occurred
+        const byte ACIA_STATUS_IRQ = 0x80; // ACIA wishes to interrupt processor
+        const byte ACIA_STATUS_PE = 0x40; // A parity error has occurred
         const byte ACIA_STATUS_OVRN = 0x20; // Receiver overrun, character not read before next came in
         const byte ACIA_STATUS_FE = 0x10;   // A framing error has occurred
         const byte ACIA_STATUS_CTS = 0x08;  // Must be LOW for clear to send. A high also forces a low TDRE
         const byte ACIA_STATUS_DCD = 0x04;  // Is LOW when clear to send. Dos not reset until CPU read status AND data.
         const byte ACIA_STATUS_TDRE = 0x02; // Is HIGH when a transmit is finished. Goes low when writing new data to send.
-        const byte ACIA_STATUS_RDRF = 0x01; // Is HIGH when a character has been read in and is ready to fetch.
+        public const byte ACIA_STATUS_RDRF = 0x01; // Is HIGH when a character has been read in and is ready to fetch.
 
         // Control register:
         const byte ACIA_CONTROL_ENABLE_IRQ = 0x80;              // A HIGH enables receive interrupt
@@ -34,86 +42,182 @@ namespace Compukit_UK101_UWP
         const byte ACIA_CONTROL_DIVISION_MASK = 0x03;           // Counter division bits.
         const byte ACIA_CONTROL_MASTER_RESET = 0x03;            // Master reset command.
 
-        public LoadAndRunTest LoadAndRunTest { get; set; }
-        public string[] file = null;
+        public byte Mode
+        {
+            get
+            {
+                return mode;
+            }
+            set
+            {
+                mode = value;
+                switch (mode)
+                {
+                    case IO_MODE_6820_TAPE:
+                        SetFlag(ACIA_STATUS_RDRF);
+                        break;
+                    case IO_MODE_6820_MIDI:
+                        ResetFlag(ACIA_STATUS_RDRF); // Will set when MIDI comes in
+                        SetFlag(ACIA_STATUS_TDRE);   // Will be kept low a few ms by timer after data sent
+                        break;
+                    case IO_MODE_6820_FILE:
+                        outStream = new MemoryStream();
+                        SetFlag(ACIA_STATUS_TDRE);   // Will be kept low all time
+                        break;
+                }
+            }
+        }
+
+        public BasicProg basicProg { get; set; }
+
+        public string[] sourceCode = null;
+
+        public MemoryStream inStream;
+        public MemoryStream outStream;
 
         private DispatcherTimer timer;
-        private byte IOMode;
         private byte ACIAStatus;
-        private byte status;
+        public String[] lines;
         private Int16 line;
         private Int16 pos;
         private byte Command;
         private MainPage mainPage;
+        private byte mode;
+        private byte keyDownCount;
+
+        // MIDI
+        private byte[] midiBuffer;
+        private byte inpointer;
+        private byte outpointer;
 
         public CACIA(MainPage mainPage)
         {
             this.mainPage = mainPage;
-            LoadAndRunTest = new LoadAndRunTest();
-            IOMode = IO_MODE_6820_TAPE;
-	        ReadOnly = false;
-	        ACIAStatus = 0x00;
+            basicProg = new BasicProg();
+            lines = basicProg.LoadAndRunTest;
+            ReadOnly = false;
+            ACIAStatus = 0x00;
             line = 0;
             pos = 0;
             timer = new DispatcherTimer();
             timer.Interval = new TimeSpan(0, 0, 0, 0, 10);// 33);
             timer.Tick += Timer_Tick;
             SetFlag(ACIA_STATUS_RDRF);
+            midiBuffer = new byte[256];
+            inpointer = 0;
+            outpointer = 0;
+            keyDownCount = 0;
         }
 
-        public override SetAddress()
-        {
-
-        }
-
+        // Processor wants to read data or status:
         public byte Read()
         {
-            if (Selected && Address.L == 1)
+            if ((Address.L & 0x01) == 0x01)
             {
-                timer.Start();
-                ResetFlag(ACIA_STATUS_RDRF);
-                if (line < LoadAndRunTest.lines.Length)
+                // Read received data:
+                switch (mode)
                 {
-                    if (pos > LoadAndRunTest.lines[line].Length - 1)
-                    {
-                        line++;
-                        pos = 0;
-                        GC.Collect();
-                        return 0x0d;
-                    }
-                    else
-                    {
-                        byte b = (byte)LoadAndRunTest.lines[line][pos++];
-                        return b;
-                    }
-                }
-                else
-                {
-                    mainPage.CSignetic6502.MemoryBus.RAM.pData[0x0203] = 0x00;
-                    return 0x00;
+                    case IO_MODE_6820_TAPE:
+                        timer.Start();
+                        ResetFlag(ACIA_STATUS_RDRF);
+                        if (line < lines.Length)
+                        {
+                            if (pos > lines[line].Length - 1)
+                            {
+                                if (lines[line] == "RUN")
+                                {
+                                    // Special treatment.
+                                    // People use to put "RUN" at end of listing in order to run the app,
+                                    // folloed by on last line containing only one space.
+                                    // The manual states procedure to use if "RUN" and pace is not inlcuded
+                                    // in listing only, and the user is told to get back to normal (not load)
+                                    // mode by pressing space and then enter.
+                                    // However, this does not work here, so if a "RUN" line is encountered
+                                    // we must tell keyboard input routine to reset the load:
+                                    mainPage.CSignetic6502.MemoryBus.Keyboard.loadResetIsNeeded = true;
+                                }
+                                line++;
+                                pos = 0;
+                                GC.Collect();
+                                return 0x0d;
+                            }
+                            else
+                            {
+                                byte b = (byte)lines[line][pos++];
+                                return b;
+                            }
+                        }
+                        return 0x00;
+                    case IO_MODE_6820_MIDI:
+                        // If this is the last byte received for now, set flag to indicate 'no data available':
+                        if ((byte)(outpointer + 1) == inpointer)
+                        {
+                            ResetFlag(ACIA_STATUS_RDRF);
+                        }
+                        return midiBuffer[outpointer++];
+                    case IO_MODE_6820_FILE:
+                        return 0xff;
+                    default:
+                        return 0xff;
                 }
             }
             else
             {
-                if (line < LoadAndRunTest.lines.Length)
+                // Read status:
+                switch (mode)
                 {
-                    return ACIAStatus;
-                }
-                else
-                {
-                    return 0;
+                    case IO_MODE_6820_TAPE:
+                        if (line < lines.Length)
+                        {
+                            return ACIAStatus;
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    case IO_MODE_6820_MIDI:
+                        if ((ACIAStatus & ACIA_STATUS_TDRE) == ACIA_STATUS_TDRE)
+                        {
+                            ResetFlag(ACIA_STATUS_TDRE); // Timer will set it again after e few ms
+                            timer.Start();
+                            return ACIA_STATUS_TDRE; // But answer that it is ok to send for now
+                        }
+                        else
+                        {
+                            return ACIAStatus;
+                        }
+                    case IO_MODE_6820_FILE:
+                        return ACIAStatus;
+                    default:
+                        return 0;
                 }
             }
         }
 
+        // Processor wants to send data or set a command
         public Boolean Write(byte InData)
         {
-            if (Selected && Address.L == 1)
+            if ((Address.L & 0x01) == 0x01)
             {
+                // Send data
+                switch (mode)
+                {
+                    case IO_MODE_6820_TAPE:
+                        break;
+                    case IO_MODE_6820_MIDI:
+                        byte[] buffer = new byte[] { InData };
+                        IBuffer ibuffer = buffer.AsBuffer();
+                        mainPage.Midi.midiOutPort.SendBuffer(ibuffer);
+                        break;
+                    case IO_MODE_6820_FILE:
+                        outStream.WriteByte(InData);
+                        break;
+                }
             }
             else
             {
-                ACIAStatus = InData;
+                // Accept a command
+                //ACIAStatus = InData;
                 Command = InData;
 
                 // Reset IRQ if disabled by current command:
@@ -125,7 +229,7 @@ namespace Compukit_UK101_UWP
                     ResetFlag(ACIA_STATUS_IRQ);
                 }
 
-                // Set RTS (not implemented on communications side yet.
+                // Set RTS (not implemented on communications side yet).
                 if ((Command & ACIA_CONTROL_TC_MASK) == ACIA_CONTROL_TC_HIGH_DISABLE)
                 {
                     // Set RTS:
@@ -138,38 +242,118 @@ namespace Compukit_UK101_UWP
             return true;
         }
 
+        // MIDI inport:
+        // The Composer only accepts what a JUNO 106 could send
+        // and only key events and only on channel 0.
+        // Key off events from JUNO 106 are key on with velocity 0!
+        // If more than one key was pressed JUNO 106 sends an
+        // all keys off message after the last key 'off' message.
+        // Juno 106 had a 61 keys keyboard ranging from 0x24 to 0x60;
+        // JUNO 106 also set an 'all keys off' when last key was released.
+        public void MidiInPort_MessageReceived(byte[] data)
+        {
+            if (mode == IO_MODE_6820_MIDI && data.Length == 3)
+            {
+                // Key event in JUNO 106 key range?
+                if ((data[0] & 0xe0) == 0x80 && data[1] >= 0x24 && data[1] <= 0x60)
+                {
+                    // Channel must be 0 for Composer to work:
+                    data[0] = (byte)(data[0] & 0xf0);
+
+                    // New style key-off is not allowed:
+                    if (data[0] == 0x80)
+                    {
+                        data[0] = 0x90;
+                        data[2] = 0x00;
+                    }
+
+                    // Velocity on must be 0x40 for Composer to work:
+                    if (data[2] > 0x00)
+                    {
+                        data[2] = 0x40;
+                    }
+
+                    // Put in buffer:
+                    midiBuffer[inpointer++] = data[0];
+                    midiBuffer[inpointer++] = data[1];
+                    midiBuffer[inpointer++] = data[2];
+
+                    // Echo to synth:
+                    if (data[2] == 0x40)
+                    {
+                        mainPage.Midi.NoteOn(0x00, data[1], 0x40);
+                    }
+                    else
+                    {
+                        mainPage.Midi.NoteOff(0x00, data[1]);
+                    }
+
+                    // Shall we add an 'all keys off' message?
+                    if (data[2] == 0)
+                    {
+                        keyDownCount--;
+                    }
+                    else
+                    {
+                        keyDownCount++;
+                    }
+                    if (keyDownCount == 0)
+                    {
+                        midiBuffer[inpointer++] = 0xb0;
+                        midiBuffer[inpointer++] = 78;
+                        midiBuffer[inpointer++] = 00;
+                    }
+
+                    // Tell Composer that data is available:
+                    SetFlag(ACIA_STATUS_RDRF);
+                }
+                // Pedal hold event?
+                else if ((data[0] & 0xf0) == 0xb0 && data[1] == 0x40)
+                {
+                    // Hold pedal event
+                    if (data[2] < 0x40)
+                    {
+                        data[2] = 0x00;
+                    }
+                    else
+                    {
+                        data[2] = 0x7f;
+                    }
+
+                    // Put in buffer:
+                    midiBuffer[inpointer++] = data[0];
+                    midiBuffer[inpointer++] = data[1];
+                    midiBuffer[inpointer++] = data[2];
+
+                    // Tell Composer that data is available:
+                    SetFlag(ACIA_STATUS_RDRF);
+                }
+            }
+        }
 
         // Clock for simulating speed and IRQ:
+        // Todo: remove the IRQ part, processor can send commands to do that.
         private void Timer_Tick(object sender, object e)
         {
-            SetFlag(ACIA_STATUS_RDRF);
-            timer.Stop();
-            SetFlag(ACIA_STATUS_RDRF);
-            if ((Command & ACIA_CONTROL_ENABLE_IRQ) != 0x00)
+            switch (mode)
             {
-                SetFlag(ACIA_STATUS_IRQ);
+                case IO_MODE_6820_TAPE:
+                    timer.Stop();
+                    SetFlag(ACIA_STATUS_RDRF);
+                    if ((Command & ACIA_CONTROL_ENABLE_IRQ) != 0x00)
+                    {
+                        SetFlag(ACIA_STATUS_IRQ);
+                    }
+                    break;
+                case IO_MODE_6820_MIDI:
+                    // MIDI in is 'clocked' by the incoming MIDI data itself.
+                    timer.Stop();
+                    SetFlag(ACIA_STATUS_TDRE); // Transmit timing handled by Composer
+                    break;
+                case IO_MODE_6820_FILE:
+                    SetFlag(ACIA_STATUS_TDRE); // Transmit timing handled by Composer
+                    break;
             }
-            //switch (Id)
-            //{
-            //    case TIMER_ACIA_READ_READY:
-            //        // It is time to make new data available, and if enabled, set the IRQ:
-            //        SetFlag(ACIA_STATUS_RDRF);
-            //        if (Command & ACIA_CONTROL_ENABLE_IRQ)
-            //        {
-            //            SetFlag(ACIA_STATUS_IRQ);
-            //        }
-            //        break;
-
-            //    case TIMER_ACIA_WRITE_READY:
-            //        // ACIA is finished sending a byte. If enabled, also set the IRQ:
-            //        SetFlag(ACIA_STATUS_TDRE);
-            //        if (Command & ACIA_CONTROL_ENABLE_IRQ)
-            //        {
-            //            SetFlag(ACIA_STATUS_IRQ);
-            //        }
-            //        break;
-            //}
-            //	KillTimer(hWnd, Id);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////
@@ -177,15 +361,24 @@ namespace Compukit_UK101_UWP
         ///////////////////////////////////////////////////////////////////////////////////
 
         // Set a flag:
-        void SetFlag(byte Flag)
+        public void SetFlag(byte Flag)
         {
             ACIAStatus = (byte)(ACIAStatus | Flag);
         }
 
         // Reset a flag:
-        void ResetFlag(byte Flag)
+        public void ResetFlag(byte Flag)
         {
             ACIAStatus = (byte)(ACIAStatus & ~Flag);
         }
+    }
+
+    public class OneByteBuffer : IBuffer
+    {
+        public uint Capacity { get { return capacity; } set { capacity = value; } }
+
+        public uint Length { get { return capacity; } set { capacity = value; } }
+
+        uint capacity;
     }
 }

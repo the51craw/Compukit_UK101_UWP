@@ -13,7 +13,6 @@ namespace Compukit_UK101_UWP
         public byte Data { get; set; }
         public Address StartsAt { get; set; }
         public Address EndsAt { get; set; }
-        public Boolean Selected { get; set; }
 
         public CMemoryBusDevice()
         {
@@ -25,18 +24,12 @@ namespace Compukit_UK101_UWP
             Address = new Address();
         }
 
-        public bool SetAddress(Address InAddress)
+        public void SetAddress(Address InAddress)
         {
             if (InAddress.W >= StartsAt.W && InAddress.W <= EndsAt.W)
             {
                 Address = new Address(InAddress);
-                Selected = true;
             }
-            else
-            {
-                Selected = false;
-            }
-            return Selected;
         }
     }
 }

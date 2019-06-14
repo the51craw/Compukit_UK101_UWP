@@ -10,14 +10,12 @@ namespace Compukit_UK101_UWP
         public byte DeviceIndex;
         public CMemoryBusDevice[] Device = new CMemoryBusDevice[DEVICES_MAX];
         public Address Address { get; set; }
-        int selectedDevice;
         public MONITOR Monitor;
         public BASIC1 Basic1;
         public BASIC2 Basic2;
         public BASIC3 Basic3;
         public BASIC4 Basic4;
         public CRAM RAM;
-        //public CCHARGEN CharGen;
         public CVDU VDU;
         public CKeyboard Keyboard;
         public CACIA ACIA;
@@ -30,8 +28,6 @@ namespace Compukit_UK101_UWP
             this.mainPage = mainPage;
             int i;
 
-            //Address = new Address();
-
             // Clear all device pointers:
             for (i = 0; i < DEVICES_MAX; i++)
             {
@@ -40,166 +36,151 @@ namespace Compukit_UK101_UWP
 
             i = 0;
 
-            // Read the system ROMs:
-            Basic1 = new BASIC1(Address);
-            Basic1.StartsAt.W = 0xA000;
-            Basic1.EndsAt.W = 0xA7FF;
-            Device[i++] = Basic1;
+            Monitor = new MONITOR(Address);
+            Monitor.StartsAt.W = 0xF800;
+            Monitor.EndsAt.W = 0xFFFF;
+            Device[0] = Monitor;
 
-            Basic2 = new BASIC2(Address);
-            Basic2.StartsAt.W = 0xA800;
-            Basic2.EndsAt.W = 0xAFFF;
-            Device[i++] = Basic2;
+            ACIA = new CACIA(mainPage);
+            ACIA.StartsAt.W = 0xF000;
+            ACIA.EndsAt.W = 0xF0FF;
+            Device[1] = ACIA;
 
-            Basic3 = new BASIC3(Address);
-            Basic3.StartsAt.W = 0xB000;
-            Basic3.EndsAt.W = 0xB7FF;
-            Device[i++] = Basic3;
+            Keyboard = new CKeyboard();
+            Keyboard.StartsAt.W = 0xDF00;
+            Keyboard.EndsAt.W = 0xDF00;
+            Device[2] = Keyboard;
+
+            VDU = new CVDU();
+            VDU.StartsAt.W = 0xD000;
+            VDU.EndsAt.W = 0xD7FF;
+            Device[3] = VDU;
 
             Basic4 = new BASIC4(Address);
             Basic4.StartsAt.W = 0xB800;
             Basic4.EndsAt.W = 0xBFFF;
-            Device[i++] = Basic4;
+            Device[4] = Basic4;
 
-            Monitor = new MONITOR(Address);
-            Monitor.StartsAt.W = 0xF800;
-            Monitor.EndsAt.W = 0xFFFF;
-            Device[i++] = Monitor;
+            Basic3 = new BASIC3(Address);
+            Basic3.StartsAt.W = 0xB000;
+            Basic3.EndsAt.W = 0xB7FF;
+            Device[5] = Basic3;
 
-            //CharGen.LoadRom("SysRoms\\CharGen.rom");
-            //CharGen.StartsAt.W = 0x0000;
-            //CharGen.EndsAt.W = 0x0000;
-            //CharGen.Accessible = false;
-            //Device[i++] = &CharGen;
+            Basic2 = new BASIC2(Address);
+            Basic2.StartsAt.W = 0xA800;
+            Basic2.EndsAt.W = 0xAFFF;
+            Device[6] = Basic2;
 
-            // Setup RAM:
-            //	RAM.SetRamSize(0x7FFF);
-            RAM = new CRAM();
-            //RAM.SetRamSize(0x8000);
-            RAM.SetRamSize(0x2000);
-            Device[i++] = RAM;
+            Basic1 = new BASIC1(Address);
+            Basic1.StartsAt.W = 0xA000;
+            Basic1.EndsAt.W = 0xA7FF;
+            Device[7] = Basic1;
 
-            // Setup keyboard:
-            //	Keyboard.StartsAt.W = 0xDC00;
-            //	Keyboard.EndsAt.W = 0xDFFF;
-            Keyboard = new CKeyboard();
-            Keyboard.StartsAt.W = 0xDF00;
-            Keyboard.EndsAt.W = 0xDF00;
-            Device[i++] = Keyboard;
-
-            // Setup VDU:
-            VDU = new CVDU();
-            VDU.StartsAt.W = 0xD000;
-            VDU.EndsAt.W = 0xD7FF;
-            //VDU.pCharData = CharGen.pData;
-            Device[i++] = VDU;
-
-            // Setup ACIA:
-            ACIA = new CACIA(mainPage);
-            ACIA.StartsAt.W = 0xF000;
-            ACIA.EndsAt.W = 0xF0FF;
-            Device[i++] = ACIA;
-
-            // Look for ROMs in folder ROMs:
             ROM8000 = new ROM8000(Address);
             ROM8000.StartsAt.W = 0x8000;
             ROM8000.EndsAt.W = 0x8FFF;
-            Device[i++] = ROM8000;
+            Device[8] = ROM8000;
+
+            RAM = new CRAM();
+            //RAM.SetRamSize(0x8000);
+            RAM.SetRamSize(0x2000);
+            Device[9] = RAM;
         }
 
         public void SetAddress(Address address)
         {
             Address = new Address(address);
             DeviceIndex = AddressToDeviceindex(Address);
-            Device[DeviceIndex].SetAddress(Address);
-            //for (Int32 i = 0; i < DEVICES_MAX; i++)
-            //{
-            //    Device[i].SetAddress(Address);
-            //}
+            if (DeviceIndex < 10)
+            {
+                Device[DeviceIndex].SetAddress(Address);
+            }
         }
 
         private byte AddressToDeviceindex(Address address)
         {
             if (Address.W >= 0xf800)
             {
-                return 4;
+                return 0;
             }
             else if (Address.W >= 0xf000)
             {
-                return 8;
+                return 1;
             }
             else if (Address.W >= 0xdf00)
             {
-                return 6;
+                return 2;
             }
             else if (Address.W >= 0xd000)
             {
-                return 7;
+                return 3;
             }
             else if (Address.W >= 0xb800)
             {
-                return 3;
+                return 4;
             }
             else if (Address.W >= 0xb000)
             {
-                return 2;
+                return 5;
             }
             else if (Address.W >= 0xa800)
             {
-                return 1;
+                return 6;
             }
             else if (Address.W >= 0xa000)
             {
-                return 0;
+                return 7;
             }
             else if (Address.W >= 0x8000)
+            {
+                return 8;
+            }
+            else if (Address.W <= RAM.EndsAt.W)
             {
                 return 9;
             }
             else
             {
-                return 5;
+                return 10;
             }
         }
 
         public void Write(byte Data)
         {
-            //for (Int32 i = 0; i < DEVICES_MAX; i++)
-            //{
-            //    if (Device[i].Selected)
-            //    {
-                    switch (DeviceIndex)
-                    {
-                        case 0:
-                            Basic1.Write(Data);
-                            break;
-                        case 1:
-                            Basic2.Write(Data);
-                            break;
-                        case 2:
-                            Basic3.Write(Data);
-                            break;
-                        case 3:
-                            Basic4.Write(Data);
-                            break;
-                        case 4:
-                            Monitor.Write(Data);
-                            break;
-                        case 5:
-                            RAM.Write(Data);
-                            break;
-                        case 6:
-                            Keyboard.Write(Data);
-                            break;
-                        case 7:
-                            VDU.Write(Data);
-                            break;
-                        case 8:
-                            ROM8000.Write(Data);
-                            break;
-                    }
-            //    }
-            //}
+            switch (DeviceIndex)
+            {
+                case 0:
+                    Monitor.Write(Data);
+                    break;
+                case 1:
+                    ACIA.Write(Data);
+                    break;
+                case 2:
+                    Keyboard.Write(Data);
+                    break;
+                case 3:
+                    VDU.Write(Data);
+                    break;
+                case 4:
+                    Basic4.Write(Data);
+                    break;
+                case 5:
+                    Basic3.Write(Data);
+                    RAM.Write(Data);
+                    break;
+                case 6:
+                    Basic2.Write(Data);
+                    break;
+                case 7:
+                    Basic1.Write(Data);
+                    break;
+                case 8:
+                    ROM8000.Write(Data);
+                    break;
+                case 9:
+                    RAM.Write(Data);
+                    break;
+            }
         }
 
         public byte Read()
@@ -210,35 +191,35 @@ namespace Compukit_UK101_UWP
             switch (DeviceIndex)
             {
                 case 0:
-                    OutData = Basic1.Read();
-                    break;
-                case 1:
-                    OutData = Basic2.Read();
-                    break;
-                case 2:
-                    OutData = Basic3.Read();
-                    break;
-                case 3:
-                    OutData = Basic4.Read();
-                    break;
-                case 4:
                     //OutData = Monitor.pData[Address.W - Monitor.StartsAt.W];
                     OutData = Monitor.Read();
                     break;
-                case 5:
-                    OutData = RAM.Read();
-                    break;
-                case 6:
-                    OutData = Keyboard.Read();
-                    break;
-                case 7:
-                    OutData = VDU.Read();
-                    break;
-                case 8:
+                case 1:
                     OutData = ACIA.Read();
                     break;
-                case 9:
+                case 2:
+                    OutData = Keyboard.Read();
+                    break;
+                case 3:
+                    OutData = VDU.Read();
+                    break;
+                case 4:
+                    OutData = Basic4.Read();
+                    break;
+                case 5:
+                    OutData = Basic3.Read();
+                    break;
+                case 6:
+                    OutData = Basic2.Read();
+                    break;
+                case 7:
+                    OutData = Basic1.Read();
+                    break;
+                case 8:
                     OutData = ROM8000.Read();
+                    break;
+                case 9:
+                    OutData = RAM.Read();
                     break;
             }
 

@@ -75,47 +75,32 @@ namespace Compukit_UK101_UWP
             }
         }
 
-        public Boolean Write(byte InData)
+        public void Write(byte InData)
         {
-            if (Selected)
-            {
-                pData[Address.W - StartsAt.W] = InData;
-                Image image = new Image();
-                String stringNumber = InData.ToString();
-                while (stringNumber.Length < 3) stringNumber = "0" + stringNumber;
-                String name = "char_" + stringNumber + ".png";
-                image.Source = new BitmapImage(new System.Uri("ms-appx:///Images/" + name));
-                image.Stretch = Stretch.Fill;
-                image.Margin = new Thickness(0, 0, -1, -1); // One pixel overlap (after stretch) to avoid gaps.
-                image.Opacity = 1;
-                image.HorizontalAlignment = HorizontalAlignment.Stretch;
-                image.VerticalAlignment = VerticalAlignment.Stretch;
-                //image.HeightRequest = 500;
-                //image.WidthRequest = 500;
-                Int32 position = Address.W - StartsAt.W;
-                Grid.SetColumn(image, position % 64);
-                Grid.SetRow(image, position / 64);
-                gridScreen.Children.RemoveAt(position);
-                gridScreen.Children.Insert(position, image);
-                image = null;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            pData[Address.W - StartsAt.W] = InData;
+            Image image = new Image();
+            String stringNumber = InData.ToString();
+            while (stringNumber.Length < 3) stringNumber = "0" + stringNumber;
+            String name = "char_" + stringNumber + ".png";
+            image.Source = new BitmapImage(new System.Uri("ms-appx:///Images/" + name));
+            image.Stretch = Stretch.Fill;
+            image.Margin = new Thickness(0, 0, -1, -1); // One pixel overlap (after stretch) to avoid gaps.
+            image.Opacity = 1;
+            image.HorizontalAlignment = HorizontalAlignment.Stretch;
+            image.VerticalAlignment = VerticalAlignment.Stretch;
+            //image.HeightRequest = 500;
+            //image.WidthRequest = 500;
+            Int32 position = Address.W - StartsAt.W;
+            Grid.SetColumn(image, position % 64);
+            Grid.SetRow(image, position / 64);
+            gridScreen.Children.RemoveAt(position);
+            gridScreen.Children.Insert(position, image);
+            image = null;
         }
 
         public byte Read()
         {
-            if (Selected)
-            {
-                return pData[Address.W - StartsAt.W];
-            }
-            else
-            {
-                return 0xFF;
-            }
+            return pData[Address.W - StartsAt.W];
         }
     }
 }

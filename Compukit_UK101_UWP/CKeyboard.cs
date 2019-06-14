@@ -9,8 +9,13 @@ namespace Compukit_UK101_UWP
         //private byte[][] Matrix;  //[8][8];
         public byte[] Keystates; //[8];
         public KeyboardMatrix Matrix;
-    	public CKeyboard()
+        private byte lastInData = 0xff;
+        public Boolean loadResetIsNeeded { get; set; }
+
+        public CKeyboard()
         {
+            loadResetIsNeeded = false;
+
             //// Setup Matrix:
             //int row, col;
             //Matrix = new byte[8][];
@@ -116,6 +121,21 @@ namespace Compukit_UK101_UWP
 
         public byte Read()
         {
+            if (loadResetIsNeeded && Data == 0xfd)
+            {
+                // Special treatment.
+                // People use to put "RUN" at end of listing in order to run the app,
+                // folloed by on last line containing only one space.
+                // The manual states procedure to use if "RUN" and pace is not inlcuded
+                // in listing only, and the user is told to get back to normal (not load)
+                // mode by pressing space and then enter.
+                // However, this does not work here, so if a "RUN" line is encountered
+                // we must tell keyboard input routine to reset the load by pressing
+                // space:
+                loadResetIsNeeded = false;
+                return 0xef;
+            }
+
             // Inverted bits for row selection.
             // Row 0 = 254 (1111 1110), row 1 = 253 (1111 1101)... row 7 = 127 (0111 1111).
             // Loop through the bits and test selected rows. 

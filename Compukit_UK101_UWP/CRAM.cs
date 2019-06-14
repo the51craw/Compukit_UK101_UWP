@@ -35,27 +35,12 @@ namespace Compukit_UK101_UWP
 
         public byte Read()
         {
-            if (Selected)
-            {
-                return pData[Address.W];
-            }
-            else
-            {
-                return 0xFF;
-            }
+            return pData[Address.W];
         }
 
-        public Boolean Write(byte InData)
+        public void Write(byte InData)
         {
-            if (Selected)
-            {
-                pData[Address.W] = InData;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            pData[Address.W] = InData;
         }
     }
 }

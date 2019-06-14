@@ -30,6 +30,10 @@ namespace Compukit_UK101_UWP
         private static MainPage mainPage { get; set; }
         public Boolean capsLock { get; set; }
 
+        public MIDI Midi { get; set; }
+
+        public Editor Editor { get; set; }
+
         private Boolean numLock = false;
         CoreVirtualKeyStates keystate;
         public MainPage()
@@ -47,56 +51,182 @@ namespace Compukit_UK101_UWP
             numLock = (keystate & CoreVirtualKeyStates.Locked) != 0;
             keystate = Window.Current.CoreWindow.GetKeyState(VirtualKey.CapitalLock);
             capsLock = (keystate & CoreVirtualKeyStates.Locked) != 0;
+            Midi = new MIDI(this);
+            SetPage(0);
+            cbSelectACIAUsage.SelectedIndex = 0;
+            Editor = new Editor();
+            cbSelectACIAUsage.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+            cbSelectMIDIOutputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+            cbSelectMIDIInputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
         }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Page switching handlers
+        //////////////////////////////////////////////////////////////////////////////////////////////
 
         private void btnEmulator_Click(object sender, RoutedEventArgs e)
         {
-            btnEmulator.Background = new SolidColorBrush(Color.FromArgb(255, 64, 255, 32));
-            btnFile.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            gridScreen.Visibility = Visibility.Visible;
-            gridFile.Visibility = Visibility.Collapsed;
-            gridHelp.Visibility = Visibility.Collapsed;
-            gridLicense.Visibility = Visibility.Collapsed;
+            SetPage(0);
+        }
+
+        private void btnBasicFiles_Click(object sender, RoutedEventArgs e)
+        {
+            SetPage(1);
+        }
+
+        private void btnAssemblerFiles_Click(object sender, RoutedEventArgs e)
+        {
+            SetPage(2);
+        }
+
+        private void btnComposerEdit_Click(object sender, RoutedEventArgs e)
+        {
+            SetPage(3);
         }
 
         private void btnFile_Click(object sender, RoutedEventArgs e)
         {
-            btnEmulator.IsFocusEngaged = false;
-            btnEmulator.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnFile.Background = new SolidColorBrush(Color.FromArgb(255, 64, 255, 32));
-            btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            gridScreen.Visibility = Visibility.Collapsed;
-            gridFile.Visibility = Visibility.Visible;
-            gridHelp.Visibility = Visibility.Collapsed;
-            gridLicense.Visibility = Visibility.Collapsed;
+            SetPage(4);
         }
 
         private void Help_Click(object sender, RoutedEventArgs e)
         {
-            btnEmulator.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnFile.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 64, 255, 32));
-            btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            gridScreen.Visibility = Visibility.Collapsed;
-            gridFile.Visibility = Visibility.Collapsed;
-            gridHelp.Visibility = Visibility.Visible;
-            gridLicense.Visibility = Visibility.Collapsed;
+            SetPage(5);
         }
 
         private void License_Click(object sender, RoutedEventArgs e)
         {
-            btnEmulator.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnFile.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 128, 128, 128));
-            btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 64, 255, 32));
+            SetPage(6);
+        }
+
+        private void SetPage(Int32 page)
+        {
+            btnEmulator.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            cbSelectMIDIInputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            cbSelectMIDIOutputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            cbSelectACIAUsage.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnBasicFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnAssemblerFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnComposerEdit.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnFile.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             gridScreen.Visibility = Visibility.Collapsed;
+            gridBasicFiles.Visibility = Visibility.Collapsed;
+            gridAssemblerFiles.Visibility = Visibility.Collapsed;
+            gridMIDI.Visibility = Visibility.Collapsed;
             gridFile.Visibility = Visibility.Collapsed;
             gridHelp.Visibility = Visibility.Collapsed;
-            gridLicense.Visibility = Visibility.Visible;
+            gridLicense.Visibility = Visibility.Collapsed;
+
+            switch (page)
+            {
+                case 0:
+                    cbSelectMIDIInputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    cbSelectMIDIOutputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    cbSelectACIAUsage.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    btnEmulator.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridScreen.Visibility = Visibility.Visible;
+                    break;
+                case 1:
+                    btnBasicFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridBasicFiles.Visibility = Visibility.Visible;
+                    break;
+                case 2:
+                    btnAssemblerFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridAssemblerFiles.Visibility = Visibility.Visible;
+                    break;
+                case 3:
+                    btnComposerEdit.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridMIDI.Visibility = Visibility.Visible;
+                    break;
+                case 4:
+                    btnFile.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridFile.Visibility = Visibility.Visible;
+                    break;
+                case 5:
+                    btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridHelp.Visibility = Visibility.Visible;
+                    break;
+                case 6:
+                    gridLicense.Visibility = Visibility.Visible;
+                    btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    break;
+            }
         }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Main page handlers (except page swithing)
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+        private async void CbSelectACIAUsage_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            switch (cbSelectACIAUsage.SelectedIndex)
+            {
+                case 0:
+                    CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_TAPE;
+                    break;
+                case 1:
+                    CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_MIDI;
+                    if (!Midi.MidiIsReady())
+                    {
+                        Midi.ResetMidiInput();
+                        Midi.ResetMidiOutput();
+                        await Midi.MakeMidiDeviceLists();
+
+                        foreach (string device in Midi.MidiInputDevices)
+                        {
+                            cbSelectMIDIInputDevice.Items.Add("In: " + device);
+                        }
+
+                        if (cbSelectMIDIInputDevice.Items.Count() > 0)
+                        {
+                            cbSelectMIDIInputDevice.SelectedIndex = 0;
+                            await Midi.InitInput((String)cbSelectMIDIInputDevice.SelectedItem);
+                        }
+
+                        foreach (string device in Midi.MidiOutputDevices)
+                        {
+                            cbSelectMIDIOutputDevice.Items.Add("Out: " + device);
+                        }
+
+                        if (cbSelectMIDIOutputDevice.Items.Count() > 0)
+                        {
+                            cbSelectMIDIOutputDevice.SelectedIndex = 0;
+                            await Midi.InitOutput((String)cbSelectMIDIOutputDevice.SelectedItem);
+                        }
+                    }
+                    break;
+                case 2:
+                    CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
+                    break;
+            }
+            //btnEmulator.Focus(FocusState.Programmatic);
+        }
+
+        private async void CbSelectMIDIInputDevice_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Midi.ResetMidiInput();
+            if (cbSelectMIDIInputDevice != null && cbSelectMIDIInputDevice.SelectedIndex > -1)
+            {
+                await Midi.InitInput((string)cbSelectMIDIInputDevice.SelectedItem);
+                //btnEmulator.Focus(FocusState.Programmatic);
+            }
+        }
+
+        private async void CbSelectMIDIOutputDevice_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Midi.ResetMidiOutput();
+            if (cbSelectMIDIOutputDevice != null && cbSelectMIDIOutputDevice.SelectedIndex > -1)
+            {
+                await Midi.InitOutput((string)cbSelectMIDIOutputDevice.SelectedItem);
+                //btnEmulator.Focus(FocusState.Programmatic);
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Emulator page event handlers
+        //////////////////////////////////////////////////////////////////////////////////////////////
 
         private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
         {
@@ -244,6 +374,34 @@ namespace Compukit_UK101_UWP
             {
                 Page_KeyUp(sender, e);
             }
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Basic files event handlers
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void BtnLoadAndRunTest_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.LoadAndRunTest;
+        }
+
+        private void BtnRobotChase_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.RobotChase;
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // ACIA and MIDI PAGE event handlers
+        //////////////////////////////////////////////////////////////////////////////////////////////
+ 
+        private void BtnReceiveFile_Click(object sender, RoutedEventArgs e)
+        {
+            Editor.AddPart(CSignetic6502.MemoryBus.ACIA.outStream.ToArray());
+        }
+
+        private void BtnSendFile_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

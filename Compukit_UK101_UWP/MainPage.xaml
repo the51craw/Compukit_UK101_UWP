@@ -19,14 +19,84 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" x:Name="btnEmulator" Content="Emulator" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="btnEmulator_Click" PreviewKeyDown="BtnEmulator_PreviewKeyDown" PreviewKeyUp="BtnEmulator_PreviewKeyUp" />
-            <Button Grid.Column="1" x:Name="btnFile" Content="File" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="btnFile_Click" />
-            <Button Grid.Column="2" x:Name="btnHelp" Content="Help" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="Help_Click" />
-            <Button Grid.Column="3" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="White" Click="License_Click" />
+            <Button Grid.Column="0" x:Name="btnEmulator" Content="Emulator" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnEmulator_Click" PreviewKeyDown="BtnEmulator_PreviewKeyDown" PreviewKeyUp="BtnEmulator_PreviewKeyUp" />
+            <ComboBox Grid.Column ="1" x:Name="cbSelectACIAUsage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectACIAUsage_SelectionChanged" >
+                <x:String>File save/load</x:String>
+                <x:String>MIDI</x:String>
+                <x:String>Serial port</x:String>
+            </ComboBox>
+            <ComboBox Grid.Column ="2" x:Name="cbSelectMIDIInputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIInputDevice_SelectionChanged"  />
+            <ComboBox Grid.Column ="3" x:Name="cbSelectMIDIOutputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIOutputDevice_SelectionChanged"  />
+            <Button Grid.Column="4" x:Name="btnComposerEdit" Content="Composer edit" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnComposerEdit_Click" />
+            <Button Grid.Column="5" x:Name="btnBasicFiles" Content="Basic files" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnBasicFiles_Click" />
+            <Button Grid.Column="6" x:Name="btnAssemblerFiles" Content="Assembler files" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnAssemblerFiles_Click" />
+            <Button Grid.Column="7" x:Name="btnFile" Content="File" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnFile_Click" />
+            <Button Grid.Column="8" x:Name="btnHelp" Content="Help" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="Help_Click" />
+            <Button Grid.Column="9" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="License_Click" />
         </Grid>
         <Grid  Grid.Row="1">
             <Grid x:Name="gridScreen" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" />
+        </Grid>
+        <Grid  Grid.Row="1">
+            <Grid x:Name="gridBasicFiles" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Button Grid.Row ="0" x:Name="btnLoadAndRunTest" Content="Load and run test" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnLoadAndRunTest_Click" />
+                <Button Grid.Row ="1" x:Name="btnRobotChase" Content="Robot chase" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnRobotChase_Click" />
+            </Grid>
+        </Grid>
+        <Grid  Grid.Row="1">
+            <Grid x:Name="gridAssemblerFiles" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <!--<Button Grid.Row ="0" x:Name="btnLoadAndRunTest" Content="Load and run test" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnLoadAndRunTest_Click" />
+                <Button Grid.Row ="1" x:Name="btnRobotChase" Content="Robot chase" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnRobotChase_Click" />-->
+            </Grid>
+        </Grid>
+        <Grid  Grid.Row="1">
+            <Grid x:Name="gridMIDI" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="ACIA connection:" HorizontalAlignment="Right" VerticalAlignment="Stretch" />
+                    <Button Grid.Column="4" x:Name="btnReceiveFile" Content="Receive file" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnReceiveFile_Click" />
+                    <Button Grid.Column="5" x:Name="btnSendFile" Content="Send file" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnSendFile_Click" />
+                </Grid>
+            </Grid>
         </Grid>
         <Grid  Grid.Row="1">
             <Grid x:Name="gridFile" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />

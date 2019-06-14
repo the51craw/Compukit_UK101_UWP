@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Compukit_UK101_UWP.Basic
+namespace Compukit_UK101_UWP
 {
-    public class LoadAndRunTest
+    public partial class BasicProg
     {
-        public string[] lines = new string[] {
+        public string[] LoadAndRunTest = new string[] {
             "10 REM THIS IS A TEST TO SEE IF KEYBOARD WORKS",
             "15 REM AFTER LOAD AND RUN",
             "20 REM TRY PRESSING KEYS FOLLOWED BY ENTER",

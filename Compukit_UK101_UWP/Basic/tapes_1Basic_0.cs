@@ -1,8 +1,8 @@
 namespace Compukit_UK101_UWP
 {
-	public class RobotChase
+	public partial class BasicProg
 	{
-		public string[] lines = new string[] {
+		public string[] RobotChase = new string[] {
 			"",
 			"",
 			" 1 POKE11,0:POKE12,253",
