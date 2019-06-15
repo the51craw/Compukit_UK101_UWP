@@ -93,6 +93,10 @@ namespace Compukit_UK101_UWP
             MemoryBus.SetAddress(adr);
             PC.H = MemoryBus.Read();
 
+            // Clear screen even if CEGMON will do that, because we might 
+            // have changed to 16 rows, and segmon will miss the bottom half.
+            MemoryBus.VDU.ClearScreen();
+
             // Reset the keyboard:
             MemoryBus.Keyboard.Reset();
 

@@ -174,6 +174,27 @@ namespace Compukit_UK101_UWP
             }
         }
 
+        public void ClearScreen()
+        {
+            for (Int32 row = 0; row < 32; row++)
+            {
+                for (Int32 col = 0; col < 64; col++)
+                {
+                    Image image = new Image();
+                    image.Source = new BitmapImage(new System.Uri("ms-appx:///Images/char_032.png"));
+                    image.Stretch = Stretch.Fill;
+                    image.Margin = new Thickness(0, 0, -1, -1); // One pixel overlap (after stretch) to avoid gaps.
+                    image.Opacity = 1;
+                    image.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    image.VerticalAlignment = VerticalAlignment.Stretch;
+                    Grid.SetColumn(image, col);
+                    Grid.SetRow(image, row);
+                    gridScreen.Children.RemoveAt(row * 64 + col);
+                    gridScreen.Children.Insert(row * 64 + col, image);
+                }
+            }
+        }
+
         public void Write(byte InData)
         {
             pData[Address.W - StartsAt.W] = InData;
