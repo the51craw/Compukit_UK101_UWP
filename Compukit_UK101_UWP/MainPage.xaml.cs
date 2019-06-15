@@ -34,19 +34,23 @@ namespace Compukit_UK101_UWP
 
         public Editor Editor { get; set; }
 
+        public Boolean InitDone { get; set; }
+
         private Boolean numLock = false;
         CoreVirtualKeyStates keystate;
         public MainPage()
         {
             this.InitializeComponent();
             mainPage = this;
+            InitDone = false;
             Init();
         }
         private void Init()
         {
             CSignetic6502 = new CSignetic6502(mainPage);
-            CSignetic6502.MemoryBus.VDU.InitCVDU(this, gridScreen);
             CClock = new CClock(this);
+            CSignetic6502.MemoryBus.VDU.InitCVDU(this, gridScreen);
+            cbSelectNumberOfLines.SelectedIndex = 1;
             keystate = Window.Current.CoreWindow.GetKeyState(VirtualKey.NumberKeyLock);
             numLock = (keystate & CoreVirtualKeyStates.Locked) != 0;
             keystate = Window.Current.CoreWindow.GetKeyState(VirtualKey.CapitalLock);
@@ -55,9 +59,11 @@ namespace Compukit_UK101_UWP
             SetPage(0);
             cbSelectACIAUsage.SelectedIndex = 0;
             Editor = new Editor();
-            cbSelectACIAUsage.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
-            cbSelectMIDIOutputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
-            cbSelectMIDIInputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+            //cbSelectNumberOfLines.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+            //cbSelectACIAUsage.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+            //cbSelectMIDIOutputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+            //cbSelectMIDIInputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
+            InitDone = true;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +108,7 @@ namespace Compukit_UK101_UWP
         private void SetPage(Int32 page)
         {
             btnEmulator.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            cbSelectNumberOfLines.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             cbSelectMIDIInputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             cbSelectMIDIOutputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             cbSelectACIAUsage.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
@@ -122,6 +129,7 @@ namespace Compukit_UK101_UWP
             switch (page)
             {
                 case 0:
+                    cbSelectNumberOfLines.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
                     cbSelectMIDIInputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
                     cbSelectMIDIOutputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
                     cbSelectACIAUsage.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
@@ -158,6 +166,20 @@ namespace Compukit_UK101_UWP
         //////////////////////////////////////////////////////////////////////////////////////////////
         // Main page handlers (except page swithing)
         //////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void CbSelectNumberOfLines_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (InitDone)
+            {
+                mainPage.CClock.Hold = true;
+                mainPage.CClock.Timer.Stop();
+                CSignetic6502.MemoryBus.VDU.NumberOfLines = (byte)(16 + 16 * cbSelectNumberOfLines.SelectedIndex);
+                mainPage.CSignetic6502.Reset();
+                mainPage.CClock.Hold = false;
+                mainPage.CClock.Timer.Start();
+            }
+            btnEmulator.Focus(FocusState.Programmatic);
+        }
 
         private async void CbSelectACIAUsage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -199,7 +221,7 @@ namespace Compukit_UK101_UWP
                     CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
                     break;
             }
-            //btnEmulator.Focus(FocusState.Programmatic);
+            btnEmulator.Focus(FocusState.Programmatic);
         }
 
         private async void CbSelectMIDIInputDevice_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -208,7 +230,7 @@ namespace Compukit_UK101_UWP
             if (cbSelectMIDIInputDevice != null && cbSelectMIDIInputDevice.SelectedIndex > -1)
             {
                 await Midi.InitInput(((string)cbSelectMIDIInputDevice.SelectedItem).Replace("In: ", ""));
-                //btnEmulator.Focus(FocusState.Programmatic);
+                btnEmulator.Focus(FocusState.Programmatic);
             }
         }
 
@@ -218,7 +240,7 @@ namespace Compukit_UK101_UWP
             if (cbSelectMIDIOutputDevice != null && cbSelectMIDIOutputDevice.SelectedIndex > -1)
             {
                 await Midi.InitOutput(((string)cbSelectMIDIOutputDevice.SelectedItem).Replace("Out: ", ""));
-                //btnEmulator.Focus(FocusState.Programmatic);
+                btnEmulator.Focus(FocusState.Programmatic);
             }
         }
 
@@ -372,6 +394,11 @@ namespace Compukit_UK101_UWP
             {
                 Page_KeyUp(sender, e);
             }
+        }
+
+        private void GridScreen_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            btnEmulator.Focus(FocusState.Programmatic);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////

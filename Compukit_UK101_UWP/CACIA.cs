@@ -197,7 +197,6 @@ namespace Compukit_UK101_UWP
                         return ACIAStatus;
                     case IO_MODE_6820_SERIAL:
                         return ACIAStatus;
-                        break;
                     default:
                         return 0;
                 }
@@ -230,7 +229,6 @@ namespace Compukit_UK101_UWP
             else
             {
                 // Accept a command
-                //ACIAStatus = InData;
                 Command = InData;
 
                 // Reset IRQ if disabled by current command:

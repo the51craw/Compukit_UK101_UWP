@@ -27,23 +27,34 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" x:Name="btnEmulator" Content="Emulator" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnEmulator_Click" PreviewKeyDown="BtnEmulator_PreviewKeyDown" PreviewKeyUp="BtnEmulator_PreviewKeyUp" />
-            <ComboBox Grid.Column ="1" x:Name="cbSelectACIAUsage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectACIAUsage_SelectionChanged" >
+            <ComboBox Grid.Column ="1" x:Name="cbSelectNumberOfLines" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectNumberOfLines_SelectionChanged" >
+                <x:String>16lines</x:String>
+                <x:String>32lines</x:String>
+            </ComboBox>
+            <ComboBox Grid.Column ="2" x:Name="cbSelectACIAUsage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectACIAUsage_SelectionChanged" >
                 <x:String>File save/load</x:String>
                 <x:String>MIDI</x:String>
                 <x:String>Tape cassette</x:String>
                 <x:String>Serial port</x:String>
             </ComboBox>
-            <ComboBox Grid.Column ="2" x:Name="cbSelectMIDIInputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIInputDevice_SelectionChanged"  />
-            <ComboBox Grid.Column ="3" x:Name="cbSelectMIDIOutputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIOutputDevice_SelectionChanged"  />
-            <Button Grid.Column="4" x:Name="btnComposerEdit" Content="Composer edit" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnComposerEdit_Click" />
-            <Button Grid.Column="5" x:Name="btnBasicFiles" Content="Basic files" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnBasicFiles_Click" />
-            <Button Grid.Column="6" x:Name="btnAssemblerFiles" Content="Assembler files" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnAssemblerFiles_Click" />
-            <Button Grid.Column="7" x:Name="btnFile" Content="File" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnFile_Click" />
-            <Button Grid.Column="8" x:Name="btnHelp" Content="Help" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="Help_Click" />
-            <Button Grid.Column="9" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="License_Click" />
+            <ComboBox Grid.Column ="3" x:Name="cbSelectMIDIInputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIInputDevice_SelectionChanged"  />
+            <ComboBox Grid.Column ="4" x:Name="cbSelectMIDIOutputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIOutputDevice_SelectionChanged"  />
+            <Button Grid.Column="5" x:Name="btnComposerEdit" Content="Composer edit" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnComposerEdit_Click" />
+            <Button Grid.Column="6" x:Name="btnBasicFiles" Content="Basic files" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnBasicFiles_Click" />
+            <Button Grid.Column="7" x:Name="btnAssemblerFiles" Content="Assembler files" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnAssemblerFiles_Click" />
+            <Button Grid.Column="8" x:Name="btnFile" Content="File" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnFile_Click" />
+            <Button Grid.Column="9" x:Name="btnHelp" Content="Help" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="Help_Click" />
+            <Button Grid.Column="10" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="License_Click" />
         </Grid>
         <Grid  Grid.Row="1">
-            <Grid x:Name="gridScreen" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" />
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0" x:Name="gridScreen" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" IsHitTestVisible="True" PointerPressed="GridScreen_PointerPressed" />
+            <!--<Grid Grid.Row="0" Grid.Column="0" x:Name="gridClickArea" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" />-->
         </Grid>
         <Grid  Grid.Row="1">
             <Grid x:Name="gridBasicFiles" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

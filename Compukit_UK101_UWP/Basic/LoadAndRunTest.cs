@@ -9,14 +9,10 @@ namespace Compukit_UK101_UWP
     public partial class BasicProg
     {
         public string[] LoadAndRunTest = new string[] {
-            "10 REM THIS IS A TEST TO SEE IF KEYBOARD WORKS",
-            "15 REM AFTER LOAD AND RUN",
-            "20 REM TRY PRESSING KEYS FOLLOWED BY ENTER",
-            "25 REM TYPE QUIT TO QUIT",
+            "10 REM THIS IS A TEST TO SET WINDOW SIZE.",
+            "15 POKE 547, 12 : POKE 549, 160",
+            "20 REM PRESS ENTER WHEN DONE.",
             "30 INPUT Q$",
-            "40 IF Q$ = \"QUIT\" THEN GOTO 999",
-            "50 PRINT \"YOU TYPED: \"Q$",
-            "60 GOTO 30",
             "999 PRINT \"BYE!\"",
             "RUN"
         };

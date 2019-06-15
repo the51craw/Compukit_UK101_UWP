@@ -7,9 +7,11 @@ namespace Compukit_UK101_UWP
 {
     public class CClock
     {
-        private MainPage mainPage;
         public DispatcherTimer Timer { get; set; }
+        public Boolean Hold { get; set; }
+
         private Int32 cycles;
+        private MainPage mainPage;
 
         public CClock(MainPage mainPage)
         {
@@ -25,7 +27,10 @@ namespace Compukit_UK101_UWP
         {
             while (cycles < 20000)
             {
-                cycles += mainPage.CSignetic6502.SingleStep();
+                if (!Hold)
+                {
+                    cycles += mainPage.CSignetic6502.SingleStep();
+                }
             }
             cycles -= 20000;
         }
