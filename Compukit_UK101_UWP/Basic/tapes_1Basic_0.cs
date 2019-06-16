@@ -32,7 +32,7 @@ namespace Compukit_UK101_UWP
 			" 250 FORI=1TO16:PRINT:NEXTI",
 			" 280 FOR I=1 TO M+7",
 			" 290 X=INT(RND(123.424)*48)+1",
-			" 300 Y=INT(RND(34.7636)*15)+1",
+			" 300 Y=INT(RND(34.7636)*14)+1",
 			" 320 IF PEEK(SC+64*Y+X)<>32 THEN 290",
 			" 325 IF I>M THEN 350",
 			" 330 POKE(SC+64*Y+X),ASC(\"+\")",

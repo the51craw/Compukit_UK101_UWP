@@ -86,7 +86,7 @@ namespace Compukit_UK101_UWP
                 //mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3bc] = 0x2f;
                 //mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3bd] = 0x4c;
                 //mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3be] = 0xd0;
-                //mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3bf] = 0x4c;
+                mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3bf] = 0x8c;
                 mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3c0] = 0xd3;
                 //mainPage.CSignetic6502.MemoryBus.RAM.pData[0x0222] = 0x47;
                 //mainPage.CSignetic6502.MemoryBus.RAM.pData[0x0223] = 0x0c;
@@ -99,7 +99,7 @@ namespace Compukit_UK101_UWP
                 //mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3bc] = 0x2f;
                 //mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3bd] = 0x4c;
                 //mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3be] = 0xd0;
-                //mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3bf] = 0x4c;
+                mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3bf] = 0x8c;
                 mainPage.CSignetic6502.MemoryBus.Monitor.pData[0x3c0] = 0xd7;
                 //mainPage.CSignetic6502.MemoryBus.RAM.pData[0x0222] = 0x47;
                 //mainPage.CSignetic6502.MemoryBus.RAM.pData[0x0223] = 0x0c;
@@ -191,6 +191,7 @@ namespace Compukit_UK101_UWP
                     Grid.SetRow(image, row);
                     gridScreen.Children.RemoveAt(row * 64 + col);
                     gridScreen.Children.Insert(row * 64 + col, image);
+                    pData[row * 64 + col] = 32;
                 }
             }
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.Pickers;
 using Windows.System;
 using Windows.UI;
 using Windows.UI.Core;
@@ -15,6 +16,9 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Storage;
+using System.Threading.Tasks;
+using Windows.Storage.Streams;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -34,15 +38,15 @@ namespace Compukit_UK101_UWP
 
         public Editor Editor { get; set; }
 
-        public Boolean InitDone { get; set; }
+        public Boolean handleControlEvents { get; set; }
 
         private Boolean numLock = false;
-        CoreVirtualKeyStates keystate;
+        private CoreVirtualKeyStates keystate;
         public MainPage()
         {
             this.InitializeComponent();
             mainPage = this;
-            InitDone = false;
+            handleControlEvents = false;
             Init();
         }
         private void Init()
@@ -63,7 +67,7 @@ namespace Compukit_UK101_UWP
             //cbSelectACIAUsage.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
             //cbSelectMIDIOutputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
             //cbSelectMIDIInputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
-            InitDone = true;
+            handleControlEvents = true;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +119,6 @@ namespace Compukit_UK101_UWP
             btnBasicFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             btnAssemblerFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             btnComposerEdit.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
-            btnFile.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             gridScreen.Visibility = Visibility.Collapsed;
@@ -149,14 +152,10 @@ namespace Compukit_UK101_UWP
                     gridMIDI.Visibility = Visibility.Visible;
                     break;
                 case 4:
-                    btnFile.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
-                    gridFile.Visibility = Visibility.Visible;
-                    break;
-                case 5:
                     btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
                     gridHelp.Visibility = Visibility.Visible;
                     break;
-                case 6:
+                case 5:
                     gridLicense.Visibility = Visibility.Visible;
                     btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
                     break;
@@ -169,14 +168,16 @@ namespace Compukit_UK101_UWP
 
         private void CbSelectNumberOfLines_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (InitDone)
+            if (handleControlEvents)
             {
-                mainPage.CClock.Hold = true;
-                mainPage.CClock.Timer.Stop();
-                CSignetic6502.MemoryBus.VDU.NumberOfLines = (byte)(16 + 16 * cbSelectNumberOfLines.SelectedIndex);
-                mainPage.CSignetic6502.Reset();
-                mainPage.CClock.Hold = false;
-                mainPage.CClock.Timer.Start();
+                CClock.Hold = true;
+                CClock.Timer.Stop();
+                CSignetic6502.MemoryBus.VDU.ClearScreen();
+                CSignetic6502.MemoryBus.VDU.NumberOfLines = 
+                    (byte)(16 + 16 * cbSelectNumberOfLines.SelectedIndex);
+                CSignetic6502.Reset();
+                CClock.Hold = false;
+                CClock.Timer.Start();
             }
             btnEmulator.Focus(FocusState.Programmatic);
         }
@@ -185,10 +186,10 @@ namespace Compukit_UK101_UWP
         {
             switch (cbSelectACIAUsage.SelectedIndex)
             {
-                case 0:
+                case 1:
                     CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_TAPE;
                     break;
-                case 1:
+                case 2:
                     CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_MIDI;
                     if (!Midi.MidiIsReady())
                     {
@@ -217,11 +218,39 @@ namespace Compukit_UK101_UWP
                         }
                     }
                     break;
-                case 2:
+                case 3: // Serial
+                    CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_SERIAL;
+                    break;
+                case 4: // Save file
+                    FileSavePicker fileSavePicker = new FileSavePicker();
+                    fileSavePicker.FileTypeChoices.Add("Basic files", new List<string>() { ".bas" });
+                    fileSavePicker.FileTypeChoices.Add("Assembler files", new List<string>() { ".asm" });
+                    //CSignetic6502.MemoryBus.ACIA.CurrentFile = await fileSavePicker.PickSaveFileAsync();
                     CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
+                    break;
+                case 5: // Load file
+                    await LoadAFile();
+                    CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
+                    cbSelectACIAUsage.SelectedIndex = 0;
                     break;
             }
             btnEmulator.Focus(FocusState.Programmatic);
+        }
+
+        private async Task LoadAFile()
+        {
+            FileOpenPicker fileOpenPicker = new FileOpenPicker();
+            fileOpenPicker.FileTypeFilter.Add(".bas");
+            fileOpenPicker.FileTypeFilter.Add(".asm");
+            StorageFile CurrentFile = await fileOpenPicker.PickSingleFileAsync();
+            if (CurrentFile != null)
+            {
+                IRandomAccessStreamWithContentType x = await CurrentFile.OpenReadAsync();
+                CSignetic6502.MemoryBus.ACIA.InputStream = x.AsStreamForRead();
+                CSignetic6502.MemoryBus.ACIA.InputStreamLength =
+                    CSignetic6502.MemoryBus.ACIA.InputStream.Seek(0, SeekOrigin.End);
+                CSignetic6502.MemoryBus.ACIA.InputStream.Seek(0, SeekOrigin.Begin);
+            }
         }
 
         private async void CbSelectMIDIInputDevice_SelectionChanged(object sender, SelectionChangedEventArgs e)

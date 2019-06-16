@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
+using Windows.Storage;
 
 namespace Compukit_UK101_UWP
 {
@@ -74,8 +75,13 @@ namespace Compukit_UK101_UWP
         }
 
         public BasicProg basicProg { get; set; }
+        //public string[] CurrentFile { get; set; }
+        public Stream InputStream { get; set; }
+        public long InputStreamLength { get; set; }
+        //public Int32 LineNumber { get; set; }
+        //public Int32 CharNumber { get; set; }
 
-        public string[] sourceCode = null;
+    public string[] sourceCode = null;
 
         public MemoryStream inStream;
         public MemoryStream outStream;
@@ -112,6 +118,7 @@ namespace Compukit_UK101_UWP
             inpointer = 0;
             outpointer = 0;
             keyDownCount = 0;
+            InputStream = null;
         }
 
         // Processor wants to read data or status:
@@ -160,9 +167,40 @@ namespace Compukit_UK101_UWP
                             ResetFlag(ACIA_STATUS_RDRF);
                         }
                         return midiBuffer[outpointer++];
-                    case IO_MODE_6820_FILE:
-                        return 0xff;
                     case IO_MODE_6820_SERIAL:
+                        return 0xff;
+                    case IO_MODE_6820_FILE:
+                        //while (CharNumber >= CurrentFile[LineNumber].Length)
+                        //{
+                        //    CharNumber = 0;
+                        //    LineNumber++;
+                        //}
+                        //if (LineNumber < CurrentFile.Length)
+                        //{
+                        //    if (CurrentFile[LineNumber][CharNumber++] != 0x0a)
+                        //    {
+                        //        return (byte)CurrentFile[LineNumber][CharNumber];
+                        //    }
+                        //}
+                        if (InputStream != null)
+                        {
+                            byte b;
+                            Int32 Byte = InputStream.ReadByte();
+                            // BASIC uses only 0d for line feeds, remove 0a:
+                            if (Byte == 10)
+                            {
+                                Byte = InputStream.ReadByte();
+                            }
+                            if (Byte > -1)
+                            {
+                                return (byte)Byte;
+                            }
+                            else
+                            {
+                                InputStream.Close();
+                                InputStream = null;
+                            }
+                        }
                         return 0xff;
                     default:
                         return 0xff;
