@@ -104,7 +104,7 @@ namespace Compukit_UK101_UWP
         {
             this.mainPage = mainPage;
             basicProg = new BasicProg();
-            lines = basicProg.LoadAndRunTest;
+            lines = basicProg.SpaceInvaders;
             ReadOnly = false;
             ACIAStatus = 0x00;
             line = 0;

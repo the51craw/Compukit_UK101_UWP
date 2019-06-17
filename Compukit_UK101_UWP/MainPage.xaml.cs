@@ -451,9 +451,165 @@ namespace Compukit_UK101_UWP
         // Basic files event handlers
         //////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void BtnLoadAndRunTest_Click(object sender, RoutedEventArgs e)
+        private void BtnAssemblerInstructions_Click(object sender, RoutedEventArgs e)
         {
-            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.LoadAndRunTest;
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.AssemblerInstructions;
+        }
+
+
+        private void BtnAssembler_01_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Assembler_01;
+        }
+
+        private void BtnAsteroidShoot_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.AsteroidShoot;
+        }
+
+        private void BtnBestFitPolynomial16_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.BestFitPolynomial16;
+        }
+
+        private void BtnBestFitPolynomial32_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.BestFitPolynomial32;
+        }
+
+        private void BtnBiorythms_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Biorythms;
+        }
+
+        private void BtnBreakout_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Breakout;
+        }
+
+        private void BtnChessboard16_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Chessboard16;
+        }
+
+        private void BtnChessboard32_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Chessboard32;
+        }
+
+        private void BtnDockingASpaceship_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.DockingASpaceship;
+        }
+
+        private void BtnDogfight_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Dogfight;
+        }
+
+        private void BtnDrawPictures_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.DrawPictures;
+        }
+
+        private void BtnDungeonAdventure_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.DungeonAdventure;
+        }
+
+        private void BtnFourierSeries_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.FourierSeries;
+        }
+
+        private void BtnGolf16_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Golf16;
+        }
+
+        private void BtnGolf32_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Golf32;
+        }
+
+        private void BtnGraphicAid_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.GraphicAid;
+        }
+
+        private void BtnGraphPlotter_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.GraphPlotter;
+        }
+
+        private void BtnGunfight_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Gunfight;
+        }
+
+        private void BtnHangman_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Hangman;
+        }
+
+        private void BtnHexapawn_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Hexapawn;
+        }
+
+        private void BtnKing_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.King;
+        }
+
+        private void BtnLife_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Life;
+        }
+
+        private void BtnMastermind_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Mastermind;
+        }
+
+        private void BtnMaze_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Maze;
+        }
+
+        private void BtnMoonLanding_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.MoonLanding;
+        }
+
+        private void BtnMugwump_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Mugwump;
+        }
+
+        private void BtnNim_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Nim;
+        }
+
+        private void BtnNoughtsAndCrosses_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.NoughtsAndCrosses;
+        }
+
+        private void BtnOnScreenEditor_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.OnScreenEditor;
+        }
+
+        private void BtnRealTimeStarTrek_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.RealTimeStarTrek;
+        }
+
+        private void BtnRealTimeStarTrekInstructions_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.RealTimeStarTrekInstructions;
         }
 
         private void BtnRobotChase_Click(object sender, RoutedEventArgs e)
@@ -461,10 +617,74 @@ namespace Compukit_UK101_UWP
             CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.RobotChase;
         }
 
+        private void BtnSolvingSimultaneousEquations_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.SolvingSimultaneousEquations;
+        }
+
+        private void BtnSpaceInvaders_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.SpaceInvaders;
+        }
+
+        private void BtnSpaceWar_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.SpaceWar;
+        }
+
+        private void BtnStarTrek_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.StarTrek;
+        }
+
+        private void BtnStarTrek3_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.StarTrek3;
+        }
+
+        private void BtnStarTrek32_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.StarTrek32;
+        }
+
+        private void BtnStarTrek4_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.StarTrek4;
+        }
+
+        private void BtnStarTrekInstructions_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.StarTrekInstructions;
+        }
+
+        private void BtnStarTrekInstructions1_32_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.StarTrekInstructions1_32;
+        }
+
+        private void BtnStarTrekInstructions2_32_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.StarTrekInstructions2_32;
+        }
+
+        private void BtnSurround_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.Surround;
+        }
+
+        private void BtnTankBattle_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.TankBattle;
+        }
+
+        private void BtnTheTowerOfBrahma32_Click(object sender, RoutedEventArgs e)
+        {
+            CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.TheTowerOfBrahma32;
+        }
         //////////////////////////////////////////////////////////////////////////////////////////////
         // ACIA and MIDI PAGE event handlers
         //////////////////////////////////////////////////////////////////////////////////////////////
- 
+
         private void BtnReceiveFile_Click(object sender, RoutedEventArgs e)
         {
             Editor.AddPart(CSignetic6502.MemoryBus.ACIA.outStream.ToArray());

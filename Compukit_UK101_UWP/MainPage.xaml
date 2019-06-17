@@ -62,9 +62,68 @@
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
-                <Button Grid.Row ="0" x:Name="btnLoadAndRunTest" Content="Load and run test" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnLoadAndRunTest_Click" />
-                <Button Grid.Row ="1" x:Name="btnRobotChase" Content="Robot chase" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnRobotChase_Click" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Row ="0" Grid.Column="0" x:Name="btnAssemblerInstructions" Content="Assembler Instructions" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnAssemblerInstructions_Click" />
+                <Button Grid.Row ="1" Grid.Column="0" x:Name="btnAssembler_01" Content="Assembler_01" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnAssembler_01_Click" />
+                <Button Grid.Row ="2" Grid.Column="0" x:Name="btnAsteroidShoot" Content="Asteroid Shoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnAsteroidShoot_Click" />
+                <Button Grid.Row ="3" Grid.Column="0" x:Name="btnBestFitPolynomial16" Content="Best Fit Polynomial 16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnBestFitPolynomial16_Click" />
+                <Button Grid.Row ="4" Grid.Column="0" x:Name="btnBestFitPolynomial32" Content="Best Fit Polynomial 32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnBestFitPolynomial32_Click" />
+                <Button Grid.Row ="5" Grid.Column="0" x:Name="btnBiorythms" Content="Biorythms" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnBiorythms_Click" />
+                <Button Grid.Row ="6" Grid.Column="0" x:Name="btnBreakout" Content="Breakout" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnBreakout_Click" />
+                <Button Grid.Row ="7" Grid.Column="0" x:Name="btnChessboard16" Content="Chessboard 16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnChessboard16_Click" />
+                <Button Grid.Row ="0" Grid.Column="1" x:Name="btnChessboard32" Content="Chessboard 32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnChessboard32_Click" />
+                <Button Grid.Row ="1" Grid.Column="1" x:Name="btnDockingASpaceship" Content="Docking a Spaceship" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnDockingASpaceship_Click" />
+                <Button Grid.Row ="2" Grid.Column="1" x:Name="btnDogfight" Content="Dogfight" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnDogfight_Click" />
+                <Button Grid.Row ="3" Grid.Column="1" x:Name="btnDrawPictures" Content="Draw Pictures" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnDrawPictures_Click" />
+                <Button Grid.Row ="4" Grid.Column="1" x:Name="btnDungeonAdventure" Content="Dungeon Adventure" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnDungeonAdventure_Click" />
+                <Button Grid.Row ="5" Grid.Column="1" x:Name="btnFourierSeries" Content="Fourier Series" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnFourierSeries_Click" />
+                <Button Grid.Row ="6" Grid.Column="1" x:Name="btnGolf16" Content="Golf 16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnGolf16_Click" />
+                <Button Grid.Row ="7" Grid.Column="1" x:Name="btnGolf32" Content="Golf 32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnGolf32_Click" />
+                <Button Grid.Row ="0" Grid.Column="2" x:Name="btnGraphicAid" Content="Graphic Aid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnGraphicAid_Click" />
+                <Button Grid.Row ="1" Grid.Column="2" x:Name="btnGraphPlotter" Content="Graph Plotter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnGraphPlotter_Click" />
+                <Button Grid.Row ="2" Grid.Column="2" x:Name="btnGunfight" Content="Gunfight" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnGunfight_Click" />
+                <Button Grid.Row ="3" Grid.Column="2" x:Name="btnHangman" Content="Hangman" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnHangman_Click" />
+                <Button Grid.Row ="4" Grid.Column="2" x:Name="btnHexapawn" Content="Hexapawn" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnHexapawn_Click" />
+                <Button Grid.Row ="5" Grid.Column="2" x:Name="btnKing" Content="King" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnKing_Click" />
+                <Button Grid.Row ="6" Grid.Column="2" x:Name="btnLife" Content="Life" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnLife_Click" />
+                <Button Grid.Row ="7" Grid.Column="2" x:Name="btnMastermind" Content="Mastermind" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnMastermind_Click" />
+                <Button Grid.Row ="0" Grid.Column="3" x:Name="btnMaze" Content="Maze" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnMaze_Click" />
+                <Button Grid.Row ="1" Grid.Column="3" x:Name="btnMoonLanding" Content="Moon Landing" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnMoonLanding_Click" />
+                <Button Grid.Row ="2" Grid.Column="3" x:Name="btnMugwump" Content="Mugwump" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnMugwump_Click" />
+                <Button Grid.Row ="3" Grid.Column="3" x:Name="btnNim" Content="Nim" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnNim_Click" />
+                <Button Grid.Row ="4" Grid.Column="3" x:Name="btnNoughtsAndCrosses" Content="Noughts and Crosses" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnNoughtsAndCrosses_Click" />
+                <Button Grid.Row ="5" Grid.Column="3" x:Name="btnOnScreenEditor" Content="On Screen Editor" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnOnScreenEditor_Click" />
+                <Button Grid.Row ="6" Grid.Column="3" x:Name="btnRealTimeStarTrek" Content="Realtime Star Trek" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnRealTimeStarTrek_Click" />
+                <Button Grid.Row ="7" Grid.Column="3" x:Name="btnRealTimeStarTrekInstructions" Content="Realtime Star Trek Instructions" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnRealTimeStarTrekInstructions_Click" />
+                <Button Grid.Row ="0" Grid.Column="4" x:Name="btnRobotChase" Content="Robot Chase" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnRobotChase_Click" />
+                <Button Grid.Row ="1" Grid.Column="4" x:Name="btnSolvingSimultaneousEquations" Content="Solving Simultaneous Equations" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnSolvingSimultaneousEquations_Click" />
+                <Button Grid.Row ="2" Grid.Column="4" x:Name="btnSpaceInvaders" Content="Space Invaders" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnSpaceInvaders_Click" />
+                <Button Grid.Row ="3" Grid.Column="4" x:Name="btnSpaceWar" Content="Space War" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnSpaceWar_Click" />
+                <Button Grid.Row ="4" Grid.Column="4" x:Name="btnStarTrek" Content="Star Trek" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnStarTrek_Click" />
+                <Button Grid.Row ="5" Grid.Column="4" x:Name="btnStarTrek3" Content="Star Trek 3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnStarTrek3_Click" />
+                <Button Grid.Row ="6" Grid.Column="4" x:Name="btnStarTrek32" Content="Star Trek 32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnStarTrek32_Click" />
+                <Button Grid.Row ="7" Grid.Column="4" x:Name="btnStarTrek4" Content="Star Trek 4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnStarTrek4_Click" />
+                <Button Grid.Row ="0" Grid.Column="5" x:Name="btnStarTrekInstructions" Content="Star Trek Instructions" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnStarTrekInstructions_Click" />
+                <Button Grid.Row ="1" Grid.Column="5" x:Name="btnStarTrekInstructions1_32" Content="Star Trek Instructions 1 32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnStarTrekInstructions1_32_Click" />
+                <Button Grid.Row ="2" Grid.Column="5" x:Name="btnStarTrekInstructions2_32" Content="Star Trek Instructions 2 32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnStarTrekInstructions2_32_Click" />
+                <Button Grid.Row ="3" Grid.Column="5" x:Name="btnSurround" Content="Surround" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnSurround_Click" />
+                <Button Grid.Row ="4" Grid.Column="5" x:Name="btnTankBattle" Content="Tank Battle" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnTankBattle_Click" />
+                <Button Grid.Row ="5" Grid.Column="5" x:Name="btnTheTowerOfBrahma32" Content="The Tower Of Brahma 32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnTheTowerOfBrahma32_Click" />
+
             </Grid>
         </Grid>
         <Grid  Grid.Row="1">
