@@ -35,14 +35,15 @@
                 <x:String>Tape cassette</x:String>
                 <x:String>MIDI</x:String>
                 <x:String>Serial port</x:String>
-                <x:String>File save</x:String>
-                <x:String>File load</x:String>
+                <x:String>Load file</x:String>
+                <x:String>Save file</x:String>
+                <x:String>Close file</x:String>
             </ComboBox>
             <ComboBox Grid.Column ="3" x:Name="cbSelectMIDIInputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIInputDevice_SelectionChanged"  />
             <ComboBox Grid.Column ="4" x:Name="cbSelectMIDIOutputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIOutputDevice_SelectionChanged"  />
             <Button Grid.Column="5" x:Name="btnComposerEdit" Content="Composer edit" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnComposerEdit_Click" />
-            <Button Grid.Column="6" x:Name="btnBasicFiles" Content="Basic files" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnBasicFiles_Click" />
-            <Button Grid.Column="7" x:Name="btnAssemblerFiles" Content="Assembler files" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnAssemblerFiles_Click" />
+            <Button Grid.Column="6" x:Name="btnBasicFiles" Content="Basic tapes" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnBasicFiles_Click" />
+            <Button Grid.Column="7" x:Name="btnAssemblerFiles" Content="Assembler tapes" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnAssemblerFiles_Click" />
             <Button Grid.Column="8" x:Name="btnHelp" Content="Help" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="Help_Click" />
             <Button Grid.Column="9" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="License_Click" />
         </Grid>

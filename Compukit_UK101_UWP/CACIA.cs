@@ -76,12 +76,11 @@ namespace Compukit_UK101_UWP
 
         public BasicProg basicProg { get; set; }
         //public string[] CurrentFile { get; set; }
-        public Stream InputStream { get; set; }
-        public long InputStreamLength { get; set; }
-        //public Int32 LineNumber { get; set; }
-        //public Int32 CharNumber { get; set; }
+        public Stream FileInputStream { get; set; }
+        public long FileInputStreamLength { get; set; }
+        public Stream FileOutputStream { get; set; }
 
-    public string[] sourceCode = null;
+        public string[] sourceCode = null;
 
         public MemoryStream inStream;
         public MemoryStream outStream;
@@ -118,7 +117,8 @@ namespace Compukit_UK101_UWP
             inpointer = 0;
             outpointer = 0;
             keyDownCount = 0;
-            InputStream = null;
+            FileInputStream = null;
+            FileOutputStream = null;
         }
 
         // Processor wants to read data or status:
@@ -182,14 +182,14 @@ namespace Compukit_UK101_UWP
                         //        return (byte)CurrentFile[LineNumber][CharNumber];
                         //    }
                         //}
-                        if (InputStream != null)
+                        if (FileInputStream != null)
                         {
                             byte b;
-                            Int32 Byte = InputStream.ReadByte();
+                            Int32 Byte = FileInputStream.ReadByte();
                             // BASIC uses only 0d for line feeds, remove 0a:
                             if (Byte == 10)
                             {
-                                Byte = InputStream.ReadByte();
+                                Byte = FileInputStream.ReadByte();
                             }
                             if (Byte > -1)
                             {
@@ -197,8 +197,8 @@ namespace Compukit_UK101_UWP
                             }
                             else
                             {
-                                InputStream.Close();
-                                InputStream = null;
+                                FileInputStream.Close();
+                                FileInputStream = null;
                             }
                         }
                         return 0xff;
@@ -256,11 +256,14 @@ namespace Compukit_UK101_UWP
                         IBuffer ibuffer = buffer.AsBuffer();
                         mainPage.Midi.midiOutPort.SendBuffer(ibuffer);
                         break;
-                    case IO_MODE_6820_FILE:
-                        outStream.WriteByte(InData);
-                        break;
                     case IO_MODE_6820_SERIAL:
                         outStream.WriteByte(InData);
+                        break;
+                    case IO_MODE_6820_FILE:
+                        if (FileOutputStream != null)
+                        {
+                            FileOutputStream.WriteByte(InData);
+                        }
                         break;
                 }
             }

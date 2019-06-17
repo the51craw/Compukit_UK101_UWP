@@ -63,10 +63,6 @@ namespace Compukit_UK101_UWP
             SetPage(0);
             cbSelectACIAUsage.SelectedIndex = 0;
             Editor = new Editor();
-            //cbSelectNumberOfLines.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
-            //cbSelectACIAUsage.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
-            //cbSelectMIDIOutputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
-            //cbSelectMIDIInputDevice.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
             handleControlEvents = true;
         }
 
@@ -221,15 +217,18 @@ namespace Compukit_UK101_UWP
                 case 3: // Serial
                     CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_SERIAL;
                     break;
-                case 4: // Save file
-                    FileSavePicker fileSavePicker = new FileSavePicker();
-                    fileSavePicker.FileTypeChoices.Add("Basic files", new List<string>() { ".bas" });
-                    fileSavePicker.FileTypeChoices.Add("Assembler files", new List<string>() { ".asm" });
-                    //CSignetic6502.MemoryBus.ACIA.CurrentFile = await fileSavePicker.PickSaveFileAsync();
-                    CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
-                    break;
-                case 5: // Load file
+                case 4: // Load file
                     await LoadAFile();
+                    CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
+                    cbSelectACIAUsage.SelectedIndex = 0;
+                    break;
+                case 5: // Save file
+                    await SaveAFile();
+                    CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
+                    cbSelectACIAUsage.SelectedIndex = 0;
+                    break;
+                case 6: // Close file
+                    CloseAFile();
                     CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
                     cbSelectACIAUsage.SelectedIndex = 0;
                     break;
@@ -246,11 +245,29 @@ namespace Compukit_UK101_UWP
             if (CurrentFile != null)
             {
                 IRandomAccessStreamWithContentType x = await CurrentFile.OpenReadAsync();
-                CSignetic6502.MemoryBus.ACIA.InputStream = x.AsStreamForRead();
-                CSignetic6502.MemoryBus.ACIA.InputStreamLength =
-                    CSignetic6502.MemoryBus.ACIA.InputStream.Seek(0, SeekOrigin.End);
-                CSignetic6502.MemoryBus.ACIA.InputStream.Seek(0, SeekOrigin.Begin);
+                CSignetic6502.MemoryBus.ACIA.FileInputStream = x.AsStreamForRead();
+                CSignetic6502.MemoryBus.ACIA.FileInputStreamLength =
+                    CSignetic6502.MemoryBus.ACIA.FileInputStream.Seek(0, SeekOrigin.End);
+                CSignetic6502.MemoryBus.ACIA.FileInputStream.Seek(0, SeekOrigin.Begin);
             }
+        }
+
+        private async Task SaveAFile()
+        {
+            FileSavePicker fileSavePicker = new FileSavePicker();
+            fileSavePicker.FileTypeChoices.Add("Basic files", new List<string>() { ".bas" });
+            fileSavePicker.FileTypeChoices.Add("Assembler files", new List<string>() { ".asm" });
+            StorageFile x = await fileSavePicker.PickSaveFileAsync();
+            CSignetic6502.MemoryBus.ACIA.FileOutputStream = await x.OpenStreamForWriteAsync();
+            CSignetic6502.MemoryBus.ACIA.Mode = CACIA.IO_MODE_6820_FILE;
+        }
+
+        private void CloseAFile()
+        {
+            CSignetic6502.MemoryBus.ACIA.FileOutputStream.Flush();
+            CSignetic6502.MemoryBus.ACIA.FileOutputStream.Close();
+            CSignetic6502.MemoryBus.ACIA.FileOutputStream.Dispose();
+            CSignetic6502.MemoryBus.ACIA.FileOutputStream = null;
         }
 
         private async void CbSelectMIDIInputDevice_SelectionChanged(object sender, SelectionChangedEventArgs e)
