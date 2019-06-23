@@ -12,15 +12,16 @@ namespace Compukit_UK101_UWP
 
         public Int32 ProcessorCycles;
         private MainPage mainPage;
+        //private DateTime dt;
 
         public CClock(MainPage mainPage)
         {
             this.mainPage = mainPage;
             Timer = new DispatcherTimer();
             Timer.Interval = new TimeSpan(0, 0, 0, 0, 1); // 1 ms
-            //Timer.Interval = new TimeSpan(100); // 10 us
             Timer.Tick += Timer_Tick;
             ProcessorCycles = 0;
+            TimeSpan oneTick = new TimeSpan(100);
         }
 
         private void Timer_Tick(object sender, object e)

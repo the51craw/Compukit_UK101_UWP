@@ -64,11 +64,13 @@ namespace Compukit_UK101_UWP
                         break;
                     case IO_MODE_6820_FILE:
                         outStream = new MemoryStream();
-                        SetFlag(ACIA_STATUS_TDRE);   // Will be kept low all time
+                        SetFlag(ACIA_STATUS_TDRE);   // Will be set all time
+                        SetFlag(ACIA_STATUS_RDRF);   // Will be set all time
                         break;
                     case IO_MODE_6820_SERIAL:
                         outStream = new MemoryStream();
-                        SetFlag(ACIA_STATUS_TDRE);   // Will be kept low all time
+                        SetFlag(ACIA_STATUS_TDRE);   // Will be set all time
+                        SetFlag(ACIA_STATUS_RDRF);   // Will be set all time
                         break;
                 }
             }
@@ -99,12 +101,14 @@ namespace Compukit_UK101_UWP
         private byte[] midiBuffer;
         private byte inpointer;
         private byte outpointer;
+        byte[] midiOutMessage = new byte[3];
+        byte midiByteNumber = 0;
 
         public CACIA(MainPage mainPage)
         {
             this.mainPage = mainPage;
             basicProg = new BasicProg();
-            lines = basicProg.SpaceInvaders;
+            lines = null;
             ReadOnly = false;
             ACIAStatus = 0x00;
             line = 0;
@@ -124,6 +128,9 @@ namespace Compukit_UK101_UWP
         // Processor wants to read data or status:
         public byte Read()
         {
+            byte b;
+            Int32 Byte;
+
             if ((Address.L & 0x01) == 0x01)
             {
                 // Read received data:
@@ -155,7 +162,7 @@ namespace Compukit_UK101_UWP
                             }
                             else
                             {
-                                byte b = (byte)lines[line][pos++];
+                                b = (byte)lines[line][pos++];
                                 return b;
                             }
                         }
@@ -168,7 +175,20 @@ namespace Compukit_UK101_UWP
                         }
                         return midiBuffer[outpointer++];
                     case IO_MODE_6820_SERIAL:
-                        return 0xff;
+                        if (inStream != null)
+                        {
+                            Byte = inStream.ReadByte();
+                            if (Byte > -1)
+                            {
+                                return (byte)Byte;
+                            }
+                            else
+                            {
+                                inStream.Close();
+                                inStream = null;
+                            }
+                        }
+                        return 0x00;
                     case IO_MODE_6820_FILE:
                         //while (CharNumber >= CurrentFile[LineNumber].Length)
                         //{
@@ -184,8 +204,7 @@ namespace Compukit_UK101_UWP
                         //}
                         if (FileInputStream != null)
                         {
-                            byte b;
-                            Int32 Byte = FileInputStream.ReadByte();
+                            Byte = FileInputStream.ReadByte();
                             // BASIC uses only 0d for line feeds, remove 0a:
                             if (Byte == 10)
                             {
@@ -252,12 +271,28 @@ namespace Compukit_UK101_UWP
                     case IO_MODE_6820_TAPE:
                         break;
                     case IO_MODE_6820_MIDI:
-                        byte[] buffer = new byte[] { InData };
-                        IBuffer ibuffer = buffer.AsBuffer();
-                        mainPage.Midi.midiOutPort.SendBuffer(ibuffer);
+                        if ((InData & 0x80) == 0x80)
+                        {
+                            midiByteNumber = 0;
+                        }
+                        midiBuffer[midiByteNumber++] = InData;
+                        if (midiByteNumber > 2)
+                        {
+                            if (midiBuffer[0] == 0x90 && midiBuffer[1] > 0)
+                            {
+                                mainPage.Midi.NoteOn(0, midiBuffer[1], midiBuffer[2]);
+                            }
+                            midiByteNumber = 0;
+                        }
+                        //byte[] buffer = new byte[] { InData };
+                        //IBuffer ibuffer = buffer.AsBuffer();
+                        //mainPage.Midi.midiOutPort.SendBuffer(ibuffer);
                         break;
                     case IO_MODE_6820_SERIAL:
-                        outStream.WriteByte(InData);
+                        if (outStream != null)
+                        {
+                            outStream.WriteByte(InData);
+                        }
                         break;
                     case IO_MODE_6820_FILE:
                         if (FileOutputStream != null)
@@ -392,10 +427,10 @@ namespace Compukit_UK101_UWP
                 case IO_MODE_6820_TAPE:
                     timer.Stop();
                     SetFlag(ACIA_STATUS_RDRF);
-                    if ((Command & ACIA_CONTROL_ENABLE_IRQ) != 0x00)
-                    {
-                        SetFlag(ACIA_STATUS_IRQ);
-                    }
+                    //if ((Command & ACIA_CONTROL_ENABLE_IRQ) != 0x00)
+                    //{
+                    //    SetFlag(ACIA_STATUS_IRQ);
+                    //}
                     break;
                 case IO_MODE_6820_MIDI:
                     // MIDI in is 'clocked' by the incoming MIDI data itself.
@@ -403,6 +438,7 @@ namespace Compukit_UK101_UWP
                     SetFlag(ACIA_STATUS_TDRE); // Transmit timing handled by Composer
                     break;
                 case IO_MODE_6820_FILE:
+                    timer.Stop();
                     SetFlag(ACIA_STATUS_TDRE); // Transmit timing handled by Composer
                     break;
             }

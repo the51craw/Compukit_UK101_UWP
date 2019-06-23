@@ -14,7 +14,7 @@ namespace Compukit_UK101_UWP
 
     public class CSignetic6502
     {
-        private Boolean DebugEnabled = true;
+        private Boolean DebugEnabled = false;
         Address PC_Debug = new Address();
         Int32 AddressMode_Debug = 0;
         String hexChars = "0123456789abcdef";
@@ -171,12 +171,20 @@ namespace Compukit_UK101_UWP
             }
         }
 
+        UInt16 test = 0x81d5;
         public int SingleStep()
         {
             int ClockCycles = 0;
             byte OpCode;
 
-            //if (DebugEnabled){PC_Debug = new Address(PC);debugBytes = null;}
+            // This is in stead of calculated breakpoints that has become incredibly slow:
+            if (mainPage.CSignetic6502.PC.W == test)
+            {
+                OpCode = 0x00;
+            }
+
+            //{PC_Debug = new Address(PC);debugBytes = null;}
+            //if (DebugEnabled) Debug.WriteLine("" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16]);
 
             // Fetch next instruction:
             MemoryBus.SetAddress(PC);

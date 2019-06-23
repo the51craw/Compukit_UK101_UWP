@@ -6,7 +6,7 @@ namespace Compukit_UK101_UWP
 {
     public class CMemoryBus
     {
-        public const Int32 DEVICES_MAX = 10;
+        public const Int32 DEVICES_MAX = 11;
         public byte DeviceIndex;
         public CMemoryBusDevice[] Device = new CMemoryBusDevice[DEVICES_MAX];
         public Address Address { get; set; }
@@ -20,6 +20,7 @@ namespace Compukit_UK101_UWP
         public CKeyboard Keyboard;
         public CACIA ACIA;
         public ROM8000 ROM8000;
+        public MicToMidi MicToMidi;
 
         private MainPage mainPage;
 
@@ -81,17 +82,22 @@ namespace Compukit_UK101_UWP
             ROM8000.EndsAt.W = 0x8FFF;
             Device[8] = ROM8000;
 
+            MicToMidi = new MicToMidi(mainPage);
+            MicToMidi.StartsAt.W = 0x6001;
+            MicToMidi.EndsAt.W = 0x6001;
+            Device[9] = MicToMidi;
+
             RAM = new CRAM();
             //RAM.SetRamSize(0x8000);
             RAM.SetRamSize(0x2000);
-            Device[9] = RAM;
+            Device[10] = RAM;
         }
 
         public void SetAddress(Address address)
         {
             Address = new Address(address);
             DeviceIndex = AddressToDeviceindex(Address);
-            if (DeviceIndex < 10)
+            if (DeviceIndex < 11)
             {
                 Device[DeviceIndex].SetAddress(Address);
             }
@@ -135,13 +141,17 @@ namespace Compukit_UK101_UWP
             {
                 return 8;
             }
-            else if (Address.W <= RAM.EndsAt.W)
+            else if (Address.W >= 0x6001)
             {
                 return 9;
             }
-            else
+            else if (Address.W <= RAM.EndsAt.W)
             {
                 return 10;
+            }
+            else
+            {
+                return 11;
             }
         }
 
@@ -178,6 +188,9 @@ namespace Compukit_UK101_UWP
                     ROM8000.Write(Data);
                     break;
                 case 9:
+                    MicToMidi.Write(Data);
+                    break;
+                case 10:
                     RAM.Write(Data);
                     break;
             }
@@ -219,6 +232,9 @@ namespace Compukit_UK101_UWP
                     OutData = ROM8000.Read();
                     break;
                 case 9:
+                    OutData = MicToMidi.Read();
+                    break;
+                case 10:
                     OutData = RAM.Read();
                     break;
             }

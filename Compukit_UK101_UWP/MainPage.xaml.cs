@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using Windows.UI.Popups;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -62,7 +63,7 @@ namespace Compukit_UK101_UWP
             Midi = new MIDI(this);
             SetPage(0);
             cbSelectACIAUsage.SelectedIndex = 0;
-            Editor = new Editor();
+            Editor = new Editor(this);
             handleControlEvents = true;
         }
 
@@ -80,29 +81,19 @@ namespace Compukit_UK101_UWP
             SetPage(1);
         }
 
-        private void btnAssemblerFiles_Click(object sender, RoutedEventArgs e)
+        private void btnComposerEdit_Click(object sender, RoutedEventArgs e)
         {
             SetPage(2);
         }
 
-        private void btnComposerEdit_Click(object sender, RoutedEventArgs e)
+        private void Help_Click(object sender, RoutedEventArgs e)
         {
             SetPage(3);
         }
 
-        private void btnFile_Click(object sender, RoutedEventArgs e)
-        {
-            SetPage(4);
-        }
-
-        private void Help_Click(object sender, RoutedEventArgs e)
-        {
-            SetPage(5);
-        }
-
         private void License_Click(object sender, RoutedEventArgs e)
         {
-            SetPage(6);
+            SetPage(4);
         }
 
         private void SetPage(Int32 page)
@@ -113,14 +104,12 @@ namespace Compukit_UK101_UWP
             cbSelectMIDIOutputDevice.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             cbSelectACIAUsage.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             btnBasicFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
-            btnAssemblerFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             btnComposerEdit.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             gridScreen.Visibility = Visibility.Collapsed;
             gridBasicFiles.Visibility = Visibility.Collapsed;
-            gridAssemblerFiles.Visibility = Visibility.Collapsed;
-            gridMIDI.Visibility = Visibility.Collapsed;
+            gridEdit.Visibility = Visibility.Collapsed;
             gridFile.Visibility = Visibility.Collapsed;
             gridHelp.Visibility = Visibility.Collapsed;
             gridLicense.Visibility = Visibility.Collapsed;
@@ -140,18 +129,14 @@ namespace Compukit_UK101_UWP
                     gridBasicFiles.Visibility = Visibility.Visible;
                     break;
                 case 2:
-                    btnAssemblerFiles.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
-                    gridAssemblerFiles.Visibility = Visibility.Visible;
+                    btnComposerEdit.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridEdit.Visibility = Visibility.Visible;
                     break;
                 case 3:
-                    btnComposerEdit.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
-                    gridMIDI.Visibility = Visibility.Visible;
-                    break;
-                case 4:
                     btnHelp.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
                     gridHelp.Visibility = Visibility.Visible;
                     break;
-                case 5:
+                case 4:
                     gridLicense.Visibility = Visibility.Visible;
                     btnLicense.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
                     break;
@@ -682,8 +667,59 @@ namespace Compukit_UK101_UWP
             CSignetic6502.MemoryBus.ACIA.lines = CSignetic6502.MemoryBus.ACIA.basicProg.TheTowerOfBrahma32;
         }
         //////////////////////////////////////////////////////////////////////////////////////////////
-        // ACIA and MIDI PAGE event handlers
+        // ACIA and MIDI PAGE event handlers and functions
         //////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void BtnNewPart_Click(object sender, RoutedEventArgs e)
+        {
+            Part part = new Part(this);
+            Editor.parts.Add(part);
+            AddPart(part);
+        }
+
+        public void AddPart(Part part)
+        {
+            part.Name = "Part_" + (cbPart.Items.Count() + 1).ToString();
+            cbPart.Items.Add(part.Name);
+            cbPart.SelectedIndex = cbPart.Items.Count() - 1;
+        }
+
+        private void TbPartName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                Int32 position = cbPart.SelectedIndex;
+                String name = (String)cbPart.SelectedItem;
+                cbPart.Items.RemoveAt(position);
+                cbPart.Items.Insert(position, tbPartName.Text);
+                cbPart.SelectedIndex = position;
+                Editor.ChangePartName(name, (String)cbPart.SelectedItem);
+            } catch { }
+        }
+
+        private void TbPartContent_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                Editor.parts[cbPart.SelectedIndex].SourceCode = tbPartContent.Text;
+            } catch { }
+        }
+
+        private void CbPart_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                tbPartName.Text = (String)cbPart.SelectedItem;
+                tbPartContent.Text = Editor.parts[cbPart.SelectedIndex].SourceCode;
+            } catch { }
+        }
+
+        private void BtnInsertPart_Click(object sender, RoutedEventArgs e)
+        {
+
+            tbEditorContent.Text = tbEditorContent.Text
+                .Insert(tbEditorContent.SelectionStart, "\r\n" + tbPartName.Text + " " + tbPartContent.Text);
+        }
 
         private void BtnReceiveFile_Click(object sender, RoutedEventArgs e)
         {
@@ -692,7 +728,33 @@ namespace Compukit_UK101_UWP
 
         private void BtnSendFile_Click(object sender, RoutedEventArgs e)
         {
+            if (Editor.Compile())
+            {
+                CSignetic6502.MemoryBus.ACIA.inStream =
+                    new System.IO.MemoryStream(Editor.Song.ObjectCode);
+            }
+        }
 
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        // Helpers
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+        public String GetPartContent()
+        {
+            return tbPartContent.Text;
+        }
+
+        public String GetEditorContent()
+        {
+            return tbEditorContent.Text;
+        }
+
+        public async void MessageBox(String Message)
+        {
+            MessageDialog warning = new MessageDialog(Message);
+            warning.Title = "Warning!";
+            warning.Commands.Add(new UICommand { Label = "Ok", Id = 0 });
+            var response = await warning.ShowAsync();
         }
     }
 }

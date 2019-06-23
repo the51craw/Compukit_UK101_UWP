@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="9c877dd2-6743-48f6-b6e4-19aa5fb5aa12"
-    Publisher="CN=hbe"
-    Version="1.0.0.0" />
+    Name="34533MrMartin.CompukitUK101emulator"
+    Publisher="CN=58B8F239-F020-4CC5-9BF5-DC3993969183"
+    Version="1.0.15.0" />
 
-  <mp:PhoneIdentity PhoneProductId="9c877dd2-6743-48f6-b6e4-19aa5fb5aa12" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="64a69f90-1518-4b40-bc03-3fa3a568a2f0" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Compukit_UK101_UWP</DisplayName>
-    <PublisherDisplayName>hbe</PublisherDisplayName>
+    <DisplayName>Compukit UK101 emulator</DisplayName>
+    <PublisherDisplayName>MrMartin</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -32,7 +32,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="Compukit_UK101_UWP.App">
       <uap:VisualElements
-        DisplayName="Compukit_UK101_UWP"
+        DisplayName="Compukit UK101 emulator"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="Compukit_UK101_UWP"
@@ -44,6 +44,6 @@
   </Applications>
 
   <Capabilities>
-    <Capability Name="internetClient" />
-  </Capabilities>
+    <uap:Capability Name="musicLibrary"/>
+    <DeviceCapability Name="microphone"/></Capabilities>
 </Package>
