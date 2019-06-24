@@ -89,8 +89,8 @@ namespace Compukit_UK101_UWP
 
         private DispatcherTimer timer;
         private byte ACIAStatus;
-        public String[] lines;
-        private Int16 line;
+        public String[] Lines { get; set; }
+        public Int16 line { get; set; }
         private Int16 pos;
         private byte Command;
         private MainPage mainPage;
@@ -108,7 +108,7 @@ namespace Compukit_UK101_UWP
         {
             this.mainPage = mainPage;
             basicProg = new BasicProg();
-            lines = null;
+            Lines = null;
             ReadOnly = false;
             ACIAStatus = 0x00;
             line = 0;
@@ -139,11 +139,11 @@ namespace Compukit_UK101_UWP
                     case IO_MODE_6820_TAPE:
                         timer.Start();
                         ResetFlag(ACIA_STATUS_RDRF);
-                        if (line < lines.Length)
+                        if (line < Lines.Length)
                         {
-                            if (pos > lines[line].Length - 1)
+                            if (pos > Lines[line].Length - 1)
                             {
-                                if (lines[line] == "RUN")
+                                if (Lines[line] == "RUN")
                                 {
                                     // Special treatment.
                                     // People use to put "RUN" at end of listing in order to run the app,
@@ -162,7 +162,7 @@ namespace Compukit_UK101_UWP
                             }
                             else
                             {
-                                b = (byte)lines[line][pos++];
+                                b = (byte)Lines[line][pos++];
                                 return b;
                             }
                         }
@@ -231,7 +231,7 @@ namespace Compukit_UK101_UWP
                 switch (mode)
                 {
                     case IO_MODE_6820_TAPE:
-                        if (line < lines.Length)
+                        if (line < Lines.Length)
                         {
                             return ACIAStatus;
                         }
