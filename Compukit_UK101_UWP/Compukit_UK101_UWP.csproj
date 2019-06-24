@@ -462,6 +462,13 @@
     <Content Include="Images\char_253.png" />
     <Content Include="Images\char_254.png" />
     <Content Include="Images\char_255.png" />
+    <Content Include="Documents\CompukitManual.pdf" />
+    <Content Include="Documents\CegmonManual.pdf" />
+    <Content Include="Documents\Composer.pdf" />
+    <Content Include="Documents\History.pdf" />
+    <Content Include="Documents\Operation.pdf" />
+    <Content Include="Documents\TheProject.pdf" />
+    <Content Include="Documents\License.pdf" />
     <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />

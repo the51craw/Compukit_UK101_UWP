@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    x:Name="root"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" KeyDown="Page_KeyDown" KeyUp="Page_KeyUp">
 
     <Grid>
@@ -15,6 +16,7 @@
         </Grid.RowDefinitions>
         <Grid  Grid.Row="0">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -42,8 +44,8 @@
             <ComboBox Grid.Column ="4" x:Name="cbSelectMIDIOutputDevice" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="CbSelectMIDIOutputDevice_SelectionChanged"  />
             <Button Grid.Column="5" x:Name="btnComposerEdit" Content="Composer edit" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnComposerEdit_Click" />
             <Button Grid.Column="6" x:Name="btnBasicFiles" Content="Basic tapes" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="btnBasicFiles_Click" />
-            <Button Grid.Column="8" x:Name="btnHelp" Content="Help" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="Help_Click" />
-            <Button Grid.Column="9" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="License_Click" />
+            <Button Grid.Column="7" x:Name="btnHelp" Content="Informaiton and help" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="Help_Click" />
+            <Button Grid.Column="8" x:Name="btnLicense" Content="License" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="License_Click" />
         </Grid>
         <Grid  Grid.Row="1">
             <Grid.RowDefinitions>
@@ -53,7 +55,6 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Row="0" Grid.Column="0" x:Name="gridScreen" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" IsHitTestVisible="True" PointerPressed="GridScreen_PointerPressed" />
-            <!--<Grid Grid.Row="0" Grid.Column="0" x:Name="gridClickArea" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" />-->
         </Grid>
         <Grid  Grid.Row="1">
             <Grid x:Name="gridBasicFiles" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -165,13 +166,115 @@
             </Grid>
         </Grid>
         <Grid  Grid.Row="1">
-            <Grid x:Name="gridFile" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            <Grid x:Name="gridHelp" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="20*" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" x:Name="btnHistory" Content="History" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnHistory_Click" />
+                    <Button Grid.Column="1" x:Name="btnTheProject" Content="The project" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnTheProject_Click" />
+                    <Button Grid.Column="2" x:Name="btnOperation" Content="Operation" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnOperation_Click" />
+                    <Button Grid.Column="3" x:Name="btnComposer" Content="Composer" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnComposer_Click" />
+                    <Button Grid.Column="4" x:Name="btnManuals" Content="Manuals" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnManuals_Click" />
+                </Grid>
+                <Grid Grid.Row="1" x:Name="gridHistory" Visibility="Visible">
+                    <ScrollViewer ZoomMode="Enabled" Background="White" Grid.Column="0">
+                        <ItemsControl ItemsSource="{Binding HistoryPages, ElementName=root}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding}" Margin="2" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+                <Grid Grid.Row="1" x:Name="gridTheProject" Visibility="Collapsed">
+                    <ScrollViewer ZoomMode="Enabled" Background="White" Grid.Column="0">
+                        <ItemsControl ItemsSource="{Binding TheProjectPages, ElementName=root}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding}" Margin="2" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+                <Grid Grid.Row="1" x:Name="gridOperation" Visibility="Collapsed">
+                    <ScrollViewer ZoomMode="Enabled" Background="White" Grid.Column="0">
+                        <ItemsControl ItemsSource="{Binding OperationPages, ElementName=root}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding}" Margin="2" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+                <Grid Grid.Row="1" x:Name="gridComposer" Visibility="Collapsed">
+                    <ScrollViewer ZoomMode="Enabled" Background="White" Grid.Column="0">
+                        <ItemsControl ItemsSource="{Binding ComposerPages, ElementName=root}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding}" Margin="2" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+                <Grid Grid.Row="1" x:Name="gridManuals" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="19*" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" x:Name="btnCompukitUK101" Content="Compukit UK101" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnCompukitUK101_Click" />
+                        <Button Grid.Column="1" x:Name="btnCegmon" Content="Cegmon" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnCegmon_Click" />
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <ScrollViewer x:Name="svUK101" ZoomMode="Enabled" Background="White" Grid.Column="0" Visibility="Visible">
+                            <ItemsControl ItemsSource="{Binding UK101Pages, ElementName=root}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding}" Margin="2" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <ScrollViewer x:Name="svCegmon" ZoomMode="Enabled" Background="White" Grid.Column="0" Visibility="Collapsed">
+                            <ItemsControl ItemsSource="{Binding CegmonPages, ElementName=root}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding}" Margin="2" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+            </Grid>
         </Grid>
-        <Grid  Grid.Row="1">
-            <Grid x:Name="gridHelp" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-        </Grid>
-        <Grid  Grid.Row="1">
-            <Grid x:Name="gridLicense" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <Grid Grid.Row="1" x:Name="gridLicense" Visibility="Collapsed">
+            <ScrollViewer ZoomMode="Enabled" Background="White" Grid.Column="0">
+                <ItemsControl ItemsSource="{Binding LicensePages, ElementName=root}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding}" Margin="2" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Page>

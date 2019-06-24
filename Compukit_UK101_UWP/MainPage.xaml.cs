@@ -20,6 +20,10 @@ using Windows.Storage;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Popups;
+using Windows.Data.Pdf;
+using Windows.UI.Xaml.Media.Imaging;
+using System.Collections.ObjectModel;
+using Windows.UI.ViewManagement;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -43,13 +47,58 @@ namespace Compukit_UK101_UWP
 
         private Boolean numLock = false;
         private CoreVirtualKeyStates keystate;
+
+        public ObservableCollection<BitmapImage> HistoryPages
+        {
+            get;
+            set;
+        } = new ObservableCollection<BitmapImage>();
+
+        public ObservableCollection<BitmapImage> TheProjectPages
+        {
+            get;
+            set;
+        } = new ObservableCollection<BitmapImage>();
+
+        public ObservableCollection<BitmapImage> OperationPages
+        {
+            get;
+            set;
+        } = new ObservableCollection<BitmapImage>();
+
+        public ObservableCollection<BitmapImage> ComposerPages
+        {
+            get;
+            set;
+        } = new ObservableCollection<BitmapImage>();
+
+        public ObservableCollection<BitmapImage> UK101Pages
+        {
+            get;
+            set;
+        } = new ObservableCollection<BitmapImage>();
+
+        public ObservableCollection<BitmapImage> CegmonPages
+        {
+            get;
+            set;
+        } = new ObservableCollection<BitmapImage>();
+
+        public ObservableCollection<BitmapImage> LicensePages
+        {
+            get;
+            set;
+        } = new ObservableCollection<BitmapImage>();
+
         public MainPage()
         {
             this.InitializeComponent();
-            mainPage = this;
+            ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(1200, 900));
             handleControlEvents = false;
             Init();
+            InitDocuments();
         }
+
         private void Init()
         {
             CSignetic6502 = new CSignetic6502(mainPage);
@@ -62,9 +111,50 @@ namespace Compukit_UK101_UWP
             capsLock = (keystate & CoreVirtualKeyStates.Locked) != 0;
             Midi = new MIDI(this);
             SetPage(0);
+            btnHistory.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+            btnTheProject.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnOperation.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnManuals.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnCompukitUK101.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+            btnCegmon.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
             cbSelectACIAUsage.SelectedIndex = 0;
             Editor = new Editor(this);
             handleControlEvents = true;
+        }
+
+        private void InitDocuments()
+        {
+            LoadDocument("History", HistoryPages);
+            LoadDocument("TheProject", TheProjectPages);
+            LoadDocument("Operation", OperationPages);
+            LoadDocument("Composer", ComposerPages);
+            LoadDocument("CompukitManual", UK101Pages);
+            LoadDocument("CegmonManual", CegmonPages);
+            LoadDocument("License", LicensePages);
+        }
+
+        private async void LoadDocument(String Name, ObservableCollection<BitmapImage> Pages)
+        {
+            StorageFile f = await
+                StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Documents/" + Name + ".pdf"));
+            PdfDocument pdfDoc = await PdfDocument.LoadFromFileAsync(f);
+
+            Pages.Clear();
+
+            for (uint i = 0; i < pdfDoc.PageCount; i++)
+            {
+                BitmapImage image = new BitmapImage();
+
+                var page = pdfDoc.GetPage(i);
+
+                using (InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream())
+                {
+                    await page.RenderToStreamAsync(stream);
+                    await image.SetSourceAsync(stream);
+                }
+
+                Pages.Add(image);
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +200,6 @@ namespace Compukit_UK101_UWP
             gridScreen.Visibility = Visibility.Collapsed;
             gridBasicFiles.Visibility = Visibility.Collapsed;
             gridEdit.Visibility = Visibility.Collapsed;
-            gridFile.Visibility = Visibility.Collapsed;
             gridHelp.Visibility = Visibility.Collapsed;
             gridLicense.Visibility = Visibility.Collapsed;
 
@@ -802,5 +891,112 @@ namespace Compukit_UK101_UWP
             warning.Commands.Add(new UICommand { Label = "Ok", Id = 0 });
             var response = await warning.ShowAsync();
         }
+
+        private void BtnHistory_Click(object sender, RoutedEventArgs e)
+        {
+            SetHelpPage(0);
+        }
+
+        private void BtnTheProject_Click(object sender, RoutedEventArgs e)
+        {
+            SetHelpPage(1);
+        }
+
+        private void BtnOperation_Click(object sender, RoutedEventArgs e)
+        {
+            SetHelpPage(2);
+        }
+
+        private void BtnComposer_Click(object sender, RoutedEventArgs e)
+        {
+            SetHelpPage(3);
+        }
+
+        private void BtnManuals_Click(object sender, RoutedEventArgs e)
+        {
+            SetHelpPage(4);
+        }
+
+        private void SetHelpPage(Int32 page)
+        {
+            btnHistory.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnTheProject.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnOperation.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnComposer.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnManuals.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            gridHistory.Visibility = Visibility.Collapsed;
+            gridTheProject.Visibility = Visibility.Collapsed;
+            gridOperation.Visibility = Visibility.Collapsed;
+            gridComposer.Visibility = Visibility.Collapsed;
+            gridManuals.Visibility = Visibility.Collapsed;
+
+            switch (page)
+            {
+                case 0:
+                    btnHistory.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridHistory.Visibility = Visibility.Visible;
+                    break;
+                case 1:
+                    btnTheProject.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridTheProject.Visibility = Visibility.Visible;
+                    break;
+                case 2:
+                    btnOperation.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridOperation.Visibility = Visibility.Visible;
+                    break;
+                case 3:
+                    btnComposer.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    gridComposer.Visibility = Visibility.Visible;
+                    break;
+                case 4:
+                    gridManuals.Visibility = Visibility.Visible;
+                    btnManuals.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+                    break;
+            }
+        }
+
+        private async void BtnCompukitUK101_Click(object sender, RoutedEventArgs e)
+        {
+            svUK101.Visibility = Visibility.Visible;
+            svCegmon.Visibility = Visibility.Collapsed;
+            btnCegmon.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnCompukitUK101.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+            //StorageFile f = await
+            //    StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Documents/CompukitManual.pdf"));
+            //PdfDocument pdfDoc = await PdfDocument.LoadFromFileAsync(f);
+            //Load(pdfDoc);
+        }
+
+        private async void BtnCegmon_Click(object sender, RoutedEventArgs e)
+        {
+            svUK101.Visibility = Visibility.Collapsed;
+            svCegmon.Visibility = Visibility.Visible;
+            btnCompukitUK101.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 160));
+            btnCegmon.Background = new SolidColorBrush(Color.FromArgb(255, 160, 160, 64));
+            //StorageFile f = await
+            //    StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Documents/CegmonManual.pdf"));
+            //PdfDocument pdfDoc = await PdfDocument.LoadFromFileAsync(f);
+            //Load(pdfDoc);
+        }
+
+        //private async void Load(PdfDocument pdfDoc)
+        //{ 
+        //    PdfPages.Clear();
+
+        //    for (uint i = 0; i < pdfDoc.PageCount; i++)
+        //    {
+        //        BitmapImage image = new BitmapImage();
+
+        //        var page = pdfDoc.GetPage(i);
+
+        //        using (InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream())
+        //        {
+        //            await page.RenderToStreamAsync(stream);
+        //            await image.SetSourceAsync(stream);
+        //        }
+
+        //        PdfPages.Add(image);
+        //    }
+        //}
     }
 }
