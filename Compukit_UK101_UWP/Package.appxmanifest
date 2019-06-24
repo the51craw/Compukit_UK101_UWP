@@ -9,7 +9,7 @@
   <Identity
     Name="34533MrMartin.CompukitUK101emulator"
     Publisher="CN=58B8F239-F020-4CC5-9BF5-DC3993969183"
-    Version="1.0.15.0" />
+    Version="1.0.19.0" />
 
   <mp:PhoneIdentity PhoneProductId="64a69f90-1518-4b40-bc03-3fa3a568a2f0" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

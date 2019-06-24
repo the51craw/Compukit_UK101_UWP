@@ -22,6 +22,7 @@ namespace Compukit_UK101_UWP
         public ROM8000 ROM8000;
         public MicToMidi MicToMidi;
         public NoDevice NoDevice;
+        private MemoryMap memoryMap;
         
         private MainPage mainPage;
 
@@ -29,6 +30,8 @@ namespace Compukit_UK101_UWP
         {
             this.mainPage = mainPage;
             int i;
+
+            memoryMap = new MemoryMap();
 
             // Clear all device pointers:
             for (i = 0; i < DEVICES_MAX; i++)
@@ -99,149 +102,19 @@ namespace Compukit_UK101_UWP
 
         public void SetAddress(UInt16 Address)
         {
-            //Address = new Address(address);
-            DeviceIndex = AddressToDeviceindex(Address);
+            DeviceIndex = memoryMap.Map[Address];
             Device[DeviceIndex].SetAddress(Address);
         }
 
-        private byte AddressToDeviceindex(UInt16 Address)
-        {
-            if (Address >= 0xf800)
-            {
-                return 0;
-            }
-            else if (Address >= 0xf000)
-            {
-                return 1;
-            }
-            else if (Address >= 0xdf00)
-            {
-                return 2;
-            }
-            else if (Address >= 0xd000)
-            {
-                return 3;
-            }
-            else if (Address >= 0xb800)
-            {
-                return 4;
-            }
-            else if (Address >= 0xb000)
-            {
-                return 5;
-            }
-            else if (Address >= 0xa800)
-            {
-                return 6;
-            }
-            else if (Address >= 0xa000)
-            {
-                return 7;
-            }
-            else if (Address >= 0x8000)
-            {
-                return 8;
-            }
-            else if (Address == 0x6001)
-            {
-                return 9;
-            }
-            else if (Address <= RAM.EndsAt)
-            {
-                return 10;
-            }
-            else
-            {
-                return 11;
-            }
-        }
 
         public void Write(byte Data)
         {
             Device[DeviceIndex].Write(Data);
-            //switch (DeviceIndex)
-            //{
-            //    case 0:
-            //        Monitor.Write(Data);
-            //        break;
-            //    case 1:
-            //        ACIA.Write(Data);
-            //        break;
-            //    case 2:
-            //        Keyboard.Write(Data);
-            //        break;
-            //    case 3:
-            //        VDU.Write(Data);
-            //        break;
-            //    case 4:
-            //        Basic4.Write(Data);
-            //        break;
-            //    case 5:
-            //        Basic3.Write(Data);
-            //        RAM.Write(Data);
-            //        break;
-            //    case 6:
-            //        Basic2.Write(Data);
-            //        break;
-            //    case 7:
-            //        Basic1.Write(Data);
-            //        break;
-            //    case 8:
-            //        ROM8000.Write(Data);
-            //        break;
-            //    case 9:
-            //        MicToMidi.Write(Data);
-            //        break;
-            //    case 10:
-            //        RAM.Write(Data);
-            //        break;
-            //}
         }
 
         public byte Read()
         {
-            // Unavailable address spaces return H as data in the real hardware:
-            // byte OutData = (byte)Address.H;
             return Device[DeviceIndex].Read();
-            //switch (DeviceIndex)
-            //{
-            //    case 0:
-            //        //OutData = Monitor.pData[Address.W - Monitor.StartsAt.W];
-            //        OutData = Monitor.Read();
-            //        break;
-            //    case 1:
-            //        OutData = ACIA.Read();
-            //        break;
-            //    case 2:
-            //        OutData = Keyboard.Read();
-            //        break;
-            //    case 3:
-            //        OutData = VDU.Read();
-            //        break;
-            //    case 4:
-            //        OutData = Basic4.Read();
-            //        break;
-            //    case 5:
-            //        OutData = Basic3.Read();
-            //        break;
-            //    case 6:
-            //        OutData = Basic2.Read();
-            //        break;
-            //    case 7:
-            //        OutData = Basic1.Read();
-            //        break;
-            //    case 8:
-            //        OutData = ROM8000.Read();
-            //        break;
-            //    case 9:
-            //        OutData = MicToMidi.Read();
-            //        break;
-            //    case 10:
-            //        OutData = RAM.Read();
-            //        break;
-            //}
-
-            //return OutData;
         }
     }
 }

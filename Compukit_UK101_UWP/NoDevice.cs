@@ -10,7 +10,7 @@ namespace Compukit_UK101_UWP
     {
         public override byte Read()
         {
-            return (byte)(Address % 256);
+            return (byte)(Address / 256);
         }
     }
 }

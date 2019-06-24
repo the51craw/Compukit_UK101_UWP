@@ -178,6 +178,7 @@
     <Compile Include="CACIA.cs" />
     <Compile Include="CClock.cs" />
     <Compile Include="CKeyboard.cs" />
+    <Compile Include="MemoryMap.cs" />
     <Compile Include="MicToMidi.cs" />
     <Compile Include="CMemoryBus.cs" />
     <Compile Include="CMemoryBusDevice.cs" />

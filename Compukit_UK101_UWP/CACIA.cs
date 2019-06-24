@@ -242,9 +242,8 @@ namespace Compukit_UK101_UWP
                     case IO_MODE_6820_MIDI:
                         if ((ACIAStatus & ACIA_STATUS_TDRE) == ACIA_STATUS_TDRE)
                         {
-                            ResetFlag(ACIA_STATUS_TDRE); // Timer will set it again after e few ms
-                            timer.Start();
-                            return ACIA_STATUS_TDRE; // But answer that it is ok to send for now
+                            SetFlag(ACIA_STATUS_TDRE);
+                            return ACIAStatus;
                         }
                         else
                         {
@@ -254,6 +253,7 @@ namespace Compukit_UK101_UWP
                         return ACIAStatus;
                     case IO_MODE_6820_SERIAL:
                         SetFlag(ACIA_STATUS_TDRE);
+                        SetFlag(ACIA_STATUS_RDRF);
                         return ACIAStatus;
                     default:
                         return 0;
@@ -315,6 +315,7 @@ namespace Compukit_UK101_UWP
                 {
                     // Reset because Rx or Tx IRQ disabled or MasterReset issued:
                     ResetFlag(ACIA_STATUS_IRQ);
+                    timer.Stop();
                 }
 
                 // Set RTS (not implemented on communications side yet).

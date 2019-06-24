@@ -39,6 +39,7 @@ namespace Compukit_UK101_UWP
         private AudioDeviceInputNode deviceInputNode;
         private AudioFrameOutputNode frameOutputNode;
         private DispatcherTimer timer;
+        private Int32 periodLength;
         private Int32 periodLengthUK101;
 
 
@@ -81,7 +82,7 @@ namespace Compukit_UK101_UWP
             frameOutputNode.Start();
 
             timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 10); // 10 ms
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 1); // 1 ms
             timer.Tick += Timer_Tick;
             timer.Start();
             periodLengthUK101 = 0;
@@ -89,68 +90,73 @@ namespace Compukit_UK101_UWP
 
         unsafe private void Timer_Tick(object sender, object e)
         {
-            AudioFrame audioFrame = frameOutputNode.GetFrame();
-            using (AudioBuffer buffer = audioFrame.LockBuffer(AudioBufferAccessMode.Read))
-            using (IMemoryBufferReference memoryBufferReference = buffer.CreateReference())
+            try
             {
-                byte* dataInBytes;
-                uint capacityInBytes;
-                float* dataInFloat;
-
-                ((IMemoryBufferByteAccess)memoryBufferReference).GetBuffer(out dataInBytes, out capacityInBytes);
-                dataInFloat = (float*)dataInBytes;
-
-                Int32 pulseOn = 0;
-                Int32 pulseOff = 0;
-                Boolean transitionUpFound = false;
-                Boolean transitionDownFound = false;
-                Int32 transitionCount = 0;
-                Boolean high = dataInFloat[0] > 0;
-                for (Int32 i = 0; i < capacityInBytes / 8; i++)
+                AudioFrame audioFrame = frameOutputNode.GetFrame();
+                using (AudioBuffer buffer = audioFrame.LockBuffer(AudioBufferAccessMode.Read))
+                using (IMemoryBufferReference memoryBufferReference = buffer.CreateReference())
                 {
-                    if (dataInFloat[i] != 0)
+                    byte* dataInBytes;
+                    uint capacityInBytes;
+                    float* dataInFloat;
+
+                    ((IMemoryBufferByteAccess)memoryBufferReference).GetBuffer(out dataInBytes, out capacityInBytes);
+                    dataInFloat = (float*)dataInBytes;
+
+                    Int32 pulseOn = 0;
+                    Int32 pulseOff = 0;
+                    Boolean transitionUpFound = false;
+                    Boolean transitionDownFound = false;
+                    Int32 transitionCount = 0;
+                    periodLength = 0;
+                    Boolean high = dataInFloat[0] > 0;
+                    for (Int32 i = 0; i < capacityInBytes / 8; i++)
                     {
-                        if (dataInFloat[i] < -0.05) // If low
+                        if (dataInFloat[i] != 0)
                         {
-                            if (high) // If was high
+                            if (dataInFloat[i] < -0.05) // If low
                             {
-                                transitionDownFound = true;
-                                transitionCount++;
+                                if (high) // If was high
+                                {
+                                    transitionDownFound = true;
+                                    transitionCount++;
+                                }
+                                high = false;
                             }
-                            high = false;
-                        }
-                        else if (dataInFloat[i] > 0.05) // Is high
-                        {
-                            if (!high) // If was low
+                            else if (dataInFloat[i] > 0.05) // Is high
                             {
-                                transitionUpFound = true;
-                                transitionCount++;
+                                if (!high) // If was low
+                                {
+                                    transitionUpFound = true;
+                                    transitionCount++;
+                                }
+                                high = true;
                             }
-                            high = true;
-                        }
 
-                        if (transitionCount > 2)
-                        {
-                            periodLengthUK101 = (int)((pulseOn + pulseOff) / 9.45);
-                            break;
-                        }
+                            if (transitionCount > 2)
+                            {
+                                periodLength = (int)((pulseOn + pulseOff) / 9.27);
+                                break;
+                            }
 
-                        if (high && transitionUpFound)
-                        {
-                            pulseOn++;
-                        }
-                        else if (!high && transitionDownFound)
-                        {
-                            pulseOff++;
+                            if (high && transitionUpFound)
+                            {
+                                pulseOn++;
+                            }
+                            else if (!high && transitionDownFound)
+                            {
+                                pulseOff++;
+                            }
                         }
                     }
+                    dataInFloat = null;
+                    dataInBytes = null;
+                    memoryBufferReference.Dispose();
+                    buffer.Dispose();
+                    audioFrame.Dispose();
+                    periodLengthUK101 = periodLength;
                 }
-                dataInFloat = null;
-                dataInBytes = null;
-                memoryBufferReference.Dispose();
-                buffer.Dispose();
-                audioFrame.Dispose();
-            }
+            } catch { }
             //audioFrame = frameOutputNode.GetFrame();
             audioGraph.Stop();
             audioGraph.ResetAllNodes();
@@ -162,10 +168,6 @@ namespace Compukit_UK101_UWP
             AudioFrame audioFrame = frameOutputNode.GetFrame();
         }
 
-        public void Write(byte inData)
-        {
-        }
-
         // This timer controls what is read from MicToMidi.
         // Since timing is different in Windows compared to UK101
         // we must translate period time to number of expected reads
@@ -174,12 +176,12 @@ namespace Compukit_UK101_UWP
         // output level accordingly to mimic the square wave produced
         // by my interface.
         Int32 cnt = 0;
-        public byte Read()
+        public override byte Read()
         {
-            if (periodLengthUK101 == 0)
-            {
-                return 0x60;
-            }
+            //if (periodLengthUK101 == 0)
+            //{
+            //    return 0x60;
+            //}
 
             cnt++;
             if (cnt > periodLengthUK101)
