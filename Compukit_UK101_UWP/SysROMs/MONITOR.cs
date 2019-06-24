@@ -6,7 +6,7 @@ namespace Compukit_UK101_UWP
     {
         public UInt16 ROMSize { get; set; }
 
-        public MONITOR(Address Address)
+        public MONITOR(ushort Address)
         {
             this.Address = Address;
 	        ReadOnly = true;
@@ -143,14 +143,9 @@ namespace Compukit_UK101_UWP
 			0x02, 0x6c, 0x1c, 0x02, 0x6c, 0x1e, 0x02, 0x6c, 0x20, 0x02, 0x30, 0x01, 0x00, 0xff, 0xc0, 0x01, // FFF0 - FFFF
         };
 
-        public byte Read()
+        public override byte Read()
         {
-            return pData[Address.W - StartsAt.W];
-        }
-
-        public bool Write(byte InData)
-        {
-            return false;
+            return pData[Address - StartsAt];
         }
     }
 }

@@ -39,10 +39,7 @@ namespace Compukit_UK101_UWP
         private AudioDeviceInputNode deviceInputNode;
         private AudioFrameOutputNode frameOutputNode;
         private DispatcherTimer timer;
-        private DispatcherTimer outTimer;
-        private Int32 periodLength;
         private Int32 periodLengthUK101;
-        private Int32 readCount;
 
 
         public MicToMidi(MainPage mainPage)
@@ -84,16 +81,10 @@ namespace Compukit_UK101_UWP
             frameOutputNode.Start();
 
             timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 1); // 1 ms
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 10); // 10 ms
             timer.Tick += Timer_Tick;
             timer.Start();
-
-            //outTimer = new DispatcherTimer();
-            //outTimer.Interval = new TimeSpan(0, 0, 0, 0, 1); // 1 ms
-            //outTimer.Tick += OutTimer_Tick;
-            //outTimer.Start();
-            readCount = 0;
-            periodLength = 0;
+            periodLengthUK101 = 0;
         }
 
         unsafe private void Timer_Tick(object sender, object e)
@@ -128,7 +119,7 @@ namespace Compukit_UK101_UWP
                             }
                             high = false;
                         }
-                        else if(dataInFloat[i] > 0.05) // Is high
+                        else if (dataInFloat[i] > 0.05) // Is high
                         {
                             if (!high) // If was low
                             {
@@ -140,7 +131,7 @@ namespace Compukit_UK101_UWP
 
                         if (transitionCount > 2)
                         {
-                            periodLength = pulseOn + pulseOff;
+                            periodLengthUK101 = (int)((pulseOn + pulseOff) / 9.45);
                             break;
                         }
 
@@ -159,9 +150,11 @@ namespace Compukit_UK101_UWP
                 memoryBufferReference.Dispose();
                 buffer.Dispose();
                 audioFrame.Dispose();
-                periodLengthUK101 = (int)(periodLength / factor);
             }
             //audioFrame = frameOutputNode.GetFrame();
+            audioGraph.Stop();
+            audioGraph.ResetAllNodes();
+            audioGraph.Start();
         }
 
         private void AudioGraph_QuantumStarted(AudioGraph sender, object args)
@@ -180,24 +173,14 @@ namespace Compukit_UK101_UWP
         // Then count how many times UK101 reads MicToMidi and swap
         // output level accordingly to mimic the square wave produced
         // by my interface.
-        // To be trimmed:
-        const int max = 10000;
-        const int min = 100;
-        const double factor = 9.45; // 9.2 - 9.7; 
-
-        private void OutTimer_Tick(object sender, object e)
-        {
-            //if (periodLength >= min && periodLength <= max)
-            {
-                periodLengthUK101 = (int)(periodLength / factor);
-
-                periodLength = 0; // Maybe...
-            }
-        }
-
         Int32 cnt = 0;
         public byte Read()
         {
+            if (periodLengthUK101 == 0)
+            {
+                return 0x60;
+            }
+
             cnt++;
             if (cnt > periodLengthUK101)
             {

@@ -196,9 +196,9 @@ namespace Compukit_UK101_UWP
             }
         }
 
-        public void Write(byte InData)
+        public override void Write(byte InData)
         {
-            pData[Address.W - StartsAt.W] = InData;
+            pData[Address - StartsAt] = InData;
             Image image = new Image();
             String stringNumber = InData.ToString();
             while (stringNumber.Length < 3) stringNumber = "0" + stringNumber;
@@ -209,7 +209,7 @@ namespace Compukit_UK101_UWP
             image.Opacity = 1;
             image.HorizontalAlignment = HorizontalAlignment.Stretch;
             image.VerticalAlignment = VerticalAlignment.Stretch;
-            Int32 position = Address.W - StartsAt.W;
+            Int32 position = Address - StartsAt;
             Grid.SetColumn(image, position % 64);
             Grid.SetRow(image, position / 64);
             gridScreen.Children.RemoveAt(position);
@@ -217,9 +217,9 @@ namespace Compukit_UK101_UWP
             image = null;
         }
 
-        public byte Read()
+        public override byte Read()
         {
-            return pData[Address.W - StartsAt.W];
+            return pData[Address - StartsAt];
         }
     }
 }

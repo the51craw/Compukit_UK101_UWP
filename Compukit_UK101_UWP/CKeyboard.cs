@@ -119,7 +119,7 @@ namespace Compukit_UK101_UWP
             }
         }
 
-        public byte Read()
+        public override byte Read()
         {
             if (loadResetIsNeeded && Data == 0xfd)
             {
@@ -154,14 +154,12 @@ namespace Compukit_UK101_UWP
             return OutData;
         }
 
-        public bool Write(byte InData)
+        public override void Write(byte InData)
         {
             // Inverted bits for row selection.
             // Row 0 = 254 (1111 1110), row 1 = 253 (1111 1101)... row 7 = 127 (0111 1111).
             // We need to store which row is selected (only one can be selected at a time).
             Data = InData;
-
-            return true;
         }
     }
 }

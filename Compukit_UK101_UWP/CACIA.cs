@@ -126,12 +126,12 @@ namespace Compukit_UK101_UWP
         }
 
         // Processor wants to read data or status:
-        public byte Read()
+        public override byte Read()
         {
             byte b;
             Int32 Byte;
 
-            if ((Address.L & 0x01) == 0x01)
+            if ((Address & 0x0001) == 0x0001)
             {
                 // Read received data:
                 switch (mode)
@@ -253,6 +253,7 @@ namespace Compukit_UK101_UWP
                     case IO_MODE_6820_FILE:
                         return ACIAStatus;
                     case IO_MODE_6820_SERIAL:
+                        SetFlag(ACIA_STATUS_TDRE);
                         return ACIAStatus;
                     default:
                         return 0;
@@ -261,9 +262,9 @@ namespace Compukit_UK101_UWP
         }
 
         // Processor wants to send data or set a command
-        public Boolean Write(byte InData)
+        public override void Write(byte InData)
         {
-            if ((Address.L & 0x01) == 0x01)
+            if ((Address & 0x0001) == 0x0001)
             {
                 // Send data
                 switch (mode)
@@ -326,7 +327,6 @@ namespace Compukit_UK101_UWP
                     // Reset RTS:
                 }
             }
-            return true;
         }
 
         // MIDI inport:

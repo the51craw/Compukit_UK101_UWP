@@ -21,6 +21,13 @@ namespace Compukit_UK101_UWP
             this.h = 0x00;
         }
 
+        public Address(UInt16 address)
+        {
+            this.w = address;
+            this.l = (byte)(address % 256);
+            this.h = (byte)(address / 256);
+        }
+
         public Address(Address address)
         {
             this.w = address.w;

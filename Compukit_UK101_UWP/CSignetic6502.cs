@@ -15,7 +15,7 @@ namespace Compukit_UK101_UWP
     public class CSignetic6502
     {
         private Boolean DebugEnabled = false;
-        Address PC_Debug = new Address();
+        ushort PC_Debug;
         Int32 AddressMode_Debug = 0;
         String hexChars = "0123456789abcdef";
         String DebugString = "";
@@ -34,22 +34,22 @@ namespace Compukit_UK101_UWP
         public byte FLAG_6502_NEGATIVE = 0x80;
 
         // Addressing modes defined:
-        public const UInt16 ADDRESS_MODE_6502_IMPLIED = 0x0001;
-        public const UInt16 ADDRESS_MODE_6502_ACCUMULATOR = 0x0002;
-        public const UInt16 ADDRESS_MODE_6502_ABSOLUTE = 0x0004;
-        public const UInt16 ADDRESS_MODE_6502_ZERO_PAGE = 0x0008;
-        public const UInt16 ADDRESS_MODE_6502_IMMEDIATE = 0x0010;
-        public const UInt16 ADDRESS_MODE_6502_ABS_X = 0x0020;
-        public const UInt16 ADDRESS_MODE_6502_ABS_Y = 0x0040;
-        public const UInt16 ADDRESS_MODE_6502_IND_X = 0x0080;
-        public const UInt16 ADDRESS_MODE_6502_IND_Y = 0x0100;
-        public const UInt16 ADDRESS_MODE_6502_Z_PAGE_X = 0x0200;
-        public const UInt16 ADDRESS_MODE_6502_RELATIVE = 0x0400;
-        public const UInt16 ADDRESS_MODE_6502_INDIRECT = 0x0800;
-        public const UInt16 ADDRESS_MODE_6502_Z_PAGE_Y = 0x1000;
+        public const ushort ADDRESS_MODE_6502_IMPLIED = 0x0001;
+        public const ushort ADDRESS_MODE_6502_ACCUMULATOR = 0x0002;
+        public const ushort ADDRESS_MODE_6502_ABSOLUTE = 0x0004;
+        public const ushort ADDRESS_MODE_6502_ZERO_PAGE = 0x0008;
+        public const ushort ADDRESS_MODE_6502_IMMEDIATE = 0x0010;
+        public const ushort ADDRESS_MODE_6502_ABS_X = 0x0020;
+        public const ushort ADDRESS_MODE_6502_ABS_Y = 0x0040;
+        public const ushort ADDRESS_MODE_6502_IND_X = 0x0080;
+        public const ushort ADDRESS_MODE_6502_IND_Y = 0x0100;
+        public const ushort ADDRESS_MODE_6502_Z_PAGE_X = 0x0200;
+        public const ushort ADDRESS_MODE_6502_RELATIVE = 0x0400;
+        public const ushort ADDRESS_MODE_6502_INDIRECT = 0x0800;
+        public const ushort ADDRESS_MODE_6502_Z_PAGE_Y = 0x1000;
 
         // Registers:
-        Address PC;    // Program counter
+        ushort PC;    // Program counter
         byte A;        // Accumulator
         byte X;        // X index
         byte Y;        // Y index
@@ -59,7 +59,7 @@ namespace Compukit_UK101_UWP
         byte ucTest;
 
         public CMemoryBus MemoryBus;
-        Address AddressInEffect;
+        ushort AddressInEffect;
         bool LogFlag;
         bool LogEnter;
 
@@ -68,11 +68,11 @@ namespace Compukit_UK101_UWP
         public CSignetic6502(MainPage mainPage)
         {
             this.mainPage = mainPage;
-            AddressInEffect = new Address();
+            //AddressInEffect = new Address();
             MemoryBus = new CMemoryBus(mainPage);
             LogFlag = false;
             LogEnter = false;
-            PC = new Address();
+            //PC = new Address();
         }
 
         private void DebugLine(String PC, String OpCode, String AddressMode, byte[] Bytes, String AddressInEffect)
@@ -84,14 +84,14 @@ namespace Compukit_UK101_UWP
         {
             // The reset vector is located at 0xFFFC - 0xFFFD.
             // Load into PC:
-            Address adr = new Address();
-            Address AddressInEffect = new Address();
-            adr.W = 0xFFFC;
+            //Address adr = new Address();
+            //Address AddressInEffect = new Address();
+            ushort adr = 0xFFFC;
             MemoryBus.SetAddress(adr);
-            PC.L = MemoryBus.Read();
-            adr.W = 0xFFFD;
+            PC = MemoryBus.Read();
+            adr = 0xFFFD;
             MemoryBus.SetAddress(adr);
-            PC.H = MemoryBus.Read();
+            PC = (ushort)(256 * MemoryBus.Read());
 
             // Clear screen even if CEGMON will do that, because we might 
             // have changed to 16 rows, and segmon will miss the bottom half.
@@ -114,10 +114,10 @@ namespace Compukit_UK101_UWP
         public void Dissassemble()
         {
             byte addressBytes;
-            for (UInt16 i = 0; i < MemoryBus.ROM8000.pData.Length; i++)
+            for (ushort i = 0; i < MemoryBus.ROM8000.pData.Length; i++)
             {
-                PC = new Address();
-                PC.W = (UInt16)(0x8000 + i);
+                //PC = new Address();
+                PC = (ushort)(0x8000 + i);
 
                 SingleStep();
                 addressBytes = 0;
@@ -171,20 +171,20 @@ namespace Compukit_UK101_UWP
             }
         }
 
-        UInt16 test = 0x81d5;
+        //ushort test = 0x81d5;
         public int SingleStep()
         {
             int ClockCycles = 0;
             byte OpCode;
 
             // This is in stead of calculated breakpoints that has become incredibly slow:
-            if (mainPage.CSignetic6502.PC.W == test)
-            {
-                OpCode = 0x00;
-            }
+            //if (mainPage.CSignetic6502.PC == test)
+            //{
+            //    OpCode = 0x00;
+            //}
 
             //{PC_Debug = new Address(PC);debugBytes = null;}
-            //if (DebugEnabled) Debug.WriteLine("" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16]);
+            //if (DebugEnabled) Debug.WriteLine("" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16]);
 
             // Fetch next instruction:
             MemoryBus.SetAddress(PC);
@@ -196,56 +196,56 @@ namespace Compukit_UK101_UWP
             {
                 // ADC
                 case 0x6D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC ABSOLUTE";
                     ADC(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0x65:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC ZERO_PAGE";
                     ADC(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0x69:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC IMMEDIATE";
                     ADC(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0x7D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC ABS_X";
                     ADC(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 4;
                     break;
 
                 case 0x79:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC ABS_Y";
                     ADC(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 4;
                     break;
 
                 case 0x61:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC IND_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC IND_X";
                     ADC(ADDRESS_MODE_6502_IND_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_X;
                     ClockCycles = 6;
                     break;
 
                 case 0x71:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC IND_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC IND_Y";
                     ADC(ADDRESS_MODE_6502_IND_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_Y;
                     ClockCycles = 5;
                     break;
 
                 case 0x75:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC(MODE_6502_Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tADC(MODE_6502_Z_PAGE_X";
                     ADC(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -253,56 +253,56 @@ namespace Compukit_UK101_UWP
 
                 // AND
                 case 0x2D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND ABSOLUTE";
                     AND(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0x25:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND ZERO_PAGE";
                     AND(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0x29:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND IMMEDIATE";
                     AND(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0x3D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND ABS_X";
                     AND(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 4;
                     break;
 
                 case 0x39:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND ABS_Y";
                     AND(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 4;
                     break;
 
                 case 0x21:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND IND_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND IND_X";
                     AND(ADDRESS_MODE_6502_IND_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_X;
                     ClockCycles = 6;
                     break;
 
                 case 0x31:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND IND_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND IND_Y";
                     AND(ADDRESS_MODE_6502_IND_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_Y;
                     ClockCycles = 5;
                     break;
 
                 case 0x35:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tAND Z_PAGE_X";
                     AND(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -310,35 +310,35 @@ namespace Compukit_UK101_UWP
 
                 // ASL
                 case 0x0A:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL ACCUMULATOR";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL ACCUMULATOR";
                     ASL(ADDRESS_MODE_6502_ACCUMULATOR);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ACCUMULATOR;
                     ClockCycles = 2;
                     break;
 
                 case 0x0E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL ABSOLUTE";
                     ASL(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 6;
                     break;
 
                 case 0x06:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL ZERO_PAGE";
                     ASL(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 5;
                     break;
 
                 case 0x1E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL ABS_X";
                     ASL(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 7;
                     break;
 
                 case 0x16:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tASL Z_PAGE_X";
                     ASL(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 6;
@@ -346,7 +346,7 @@ namespace Compukit_UK101_UWP
 
                 // BCC
                 case 0x90:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBCC RELATIVE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBCC RELATIVE";
                     BCC(ADDRESS_MODE_6502_RELATIVE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_RELATIVE;
                     ClockCycles = 2;
@@ -354,7 +354,7 @@ namespace Compukit_UK101_UWP
 
                 // BCS
                 case 0xB0:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBCS RELATIVE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBCS RELATIVE";
                     BCS(ADDRESS_MODE_6502_RELATIVE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_RELATIVE;
                     ClockCycles = 2;
@@ -362,7 +362,7 @@ namespace Compukit_UK101_UWP
 
                 // BEQ
                 case 0xF0:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBEQ RELATIVE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBEQ RELATIVE";
                     BEQ(ADDRESS_MODE_6502_RELATIVE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_RELATIVE;
                     ClockCycles = 2;
@@ -370,14 +370,14 @@ namespace Compukit_UK101_UWP
 
                 // BIT
                 case 0x2C:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBIT ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBIT ABSOLUTE";
                     BIT(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0x24:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBIT ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBIT ZERO_PAGE";
                     BIT(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
@@ -385,7 +385,7 @@ namespace Compukit_UK101_UWP
 
                 // BMI
                 case 0x30:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBMI RELATIVE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBMI RELATIVE";
                     BMI(ADDRESS_MODE_6502_RELATIVE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_RELATIVE;
                     ClockCycles = 2;
@@ -393,7 +393,7 @@ namespace Compukit_UK101_UWP
 
                 // BNE
                 case 0xD0:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBNE RELATIVE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBNE RELATIVE";
                     BNE(ADDRESS_MODE_6502_RELATIVE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_RELATIVE;
                     ClockCycles = 2;
@@ -401,7 +401,7 @@ namespace Compukit_UK101_UWP
 
                 // BPL
                 case 0x10:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBPL RELATIVE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBPL RELATIVE";
                     BPL(ADDRESS_MODE_6502_RELATIVE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_RELATIVE;
                     ClockCycles = 2;
@@ -409,7 +409,7 @@ namespace Compukit_UK101_UWP
 
                 // BRK
                 case 0x00:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBRK IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBRK IMPLIED";
                     BRK(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 7;
@@ -417,7 +417,7 @@ namespace Compukit_UK101_UWP
 
                 // BVC
                 case 0x50:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBVC RELATIVE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBVC RELATIVE";
                     BVC(ADDRESS_MODE_6502_RELATIVE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_RELATIVE;
                     ClockCycles = 2;
@@ -425,7 +425,7 @@ namespace Compukit_UK101_UWP
 
                 // BVS
                 case 0x70:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBVS RELATIVE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tBVS RELATIVE";
                     BVS(ADDRESS_MODE_6502_RELATIVE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_RELATIVE;
                     ClockCycles = 2;
@@ -433,7 +433,7 @@ namespace Compukit_UK101_UWP
 
                 // CLC
                 case 0x18:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCLC IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCLC IMPLIED";
                     CLC(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -441,7 +441,7 @@ namespace Compukit_UK101_UWP
 
                 // CLD
                 case 0xD8:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCLD IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCLD IMPLIED";
                     CLD(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -449,7 +449,7 @@ namespace Compukit_UK101_UWP
 
                 // CLI
                 case 0x58:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCLI IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCLI IMPLIED";
                     CLI(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -457,7 +457,7 @@ namespace Compukit_UK101_UWP
 
                 // CLV
                 case 0xB8:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCLV IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCLV IMPLIED";
                     CLV(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -465,56 +465,56 @@ namespace Compukit_UK101_UWP
 
                 // CMP
                 case 0xCD:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP ABSOLUTE";
                     CMP(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0xC5:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP ZERO_PAGE";
                     CMP(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0xC9:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP IMMEDIATE";
                     CMP(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0xDD:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP ABS_X";
                     CMP(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 4;
                     break;
 
                 case 0xD9:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP ABS_Y";
                     CMP(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 4;
                     break;
 
                 case 0xC1:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP IND_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP IND_X";
                     CMP(ADDRESS_MODE_6502_IND_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_X;
                     ClockCycles = 6;
                     break;
 
                 case 0xD1:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP IND_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP IND_Y";
                     CMP(ADDRESS_MODE_6502_IND_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_Y;
                     ClockCycles = 5;
                     break;
 
                 case 0xD5:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCMP Z_PAGE_X";
                     CMP(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -522,21 +522,21 @@ namespace Compukit_UK101_UWP
 
                 // CPX
                 case 0xEC:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPX ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPX ABSOLUTE";
                     CPX(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0xE4:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPX ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPX ZERO_PAGE";
                     CPX(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0xE0:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPX IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPX IMMEDIATE";
                     CPX(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
@@ -544,21 +544,21 @@ namespace Compukit_UK101_UWP
 
                 // CPY
                 case 0xCC:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPY ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPY ABSOLUTE";
                     CPY(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0xC4:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPY ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPY ZERO_PAGE";
                     CPY(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0xC0:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPY IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tCPY IMMEDIATE";
                     CPY(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
@@ -566,28 +566,28 @@ namespace Compukit_UK101_UWP
 
                 // DEC
                 case 0xCE:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEC ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEC ABSOLUTE";
                     DEC(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 6;
                     break;
 
                 case 0xC6:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEC ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEC ZERO_PAGE";
                     DEC(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 5;
                     break;
 
                 case 0xDE:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEC ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEC ABS_X";
                     DEC(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 7;
                     break;
 
                 case 0xD6:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEC Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEC Z_PAGE_X";
                     DEC(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 6;
@@ -595,7 +595,7 @@ namespace Compukit_UK101_UWP
 
                 // DEX
                 case 0xCA:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEX IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEX IMPLIED";
                     DEX(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -603,7 +603,7 @@ namespace Compukit_UK101_UWP
 
                 // DEY
                 case 0x88:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEY IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tDEY IMPLIED";
                     DEY(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -611,56 +611,56 @@ namespace Compukit_UK101_UWP
 
                 // EOR
                 case 0x4D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR ABSOLUTE";
                     EOR(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0x45:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR ZERO_PAGE";
                     EOR(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0x49:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR IMMEDIATE";
                     EOR(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0x5D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR ABS_X";
                     EOR(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 4;
                     break;
 
                 case 0x59:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR ABS_Y";
                     EOR(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 4;
                     break;
 
                 case 0x41:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR IND_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR IND_X";
                     EOR(ADDRESS_MODE_6502_IND_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_X;
                     ClockCycles = 6;
                     break;
 
                 case 0x51:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR IND_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR IND_Y";
                     EOR(ADDRESS_MODE_6502_IND_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_Y;
                     ClockCycles = 5;
                     break;
 
                 case 0x55:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tEOR Z_PAGE_X";
                     EOR(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -668,28 +668,28 @@ namespace Compukit_UK101_UWP
 
                 // INC
                 case 0xEE:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINC ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINC ABSOLUTE";
                     INC(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 6;
                     break;
 
                 case 0xE6:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINC ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINC ZERO_PAGE";
                     INC(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 5;
                     break;
 
                 case 0xFE:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINC ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINC ABS_X";
                     INC(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 7;
                     break;
 
                 case 0xF6:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINC Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINC Z_PAGE_X";
                     INC(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 6;
@@ -697,7 +697,7 @@ namespace Compukit_UK101_UWP
 
                 // INX
                 case 0xE8:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINX IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINX IMPLIED";
                     INX(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -705,7 +705,7 @@ namespace Compukit_UK101_UWP
 
                 // INY
                 case 0xC8:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINY IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tINY IMPLIED";
                     INY(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -713,14 +713,14 @@ namespace Compukit_UK101_UWP
 
                 // JMP
                 case 0x4C:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tJMP ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tJMP ABSOLUTE";
                     JMP(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 3;
                     break;
 
                 case 0x6C:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tJMP INDIRECT";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tJMP INDIRECT";
                     JMP(ADDRESS_MODE_6502_INDIRECT);
                     //AddressMode_Debug = ADDRESS_MODE_6502_INDIRECT;
                     ClockCycles = 5;
@@ -728,7 +728,7 @@ namespace Compukit_UK101_UWP
 
                 // JSR
                 case 0x20:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tJSR ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tJSR ABSOLUTE";
                     JSR(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 6;
@@ -736,56 +736,56 @@ namespace Compukit_UK101_UWP
 
                 // LDA
                 case 0xAD:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA ABSOLUTE";
                     LDA(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0xA5:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA ZERO_PAGE";
                     LDA(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0xA9:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA IMMEDIATE";
                     LDA(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0xBD:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA ABS_X";
                     LDA(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 4;
                     break;
 
                 case 0xB9:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA ABS_Y";
                     LDA(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 4;
                     break;
 
                 case 0xA1:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA IND_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA IND_X";
                     LDA(ADDRESS_MODE_6502_IND_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_X;
                     ClockCycles = 6;
                     break;
 
                 case 0xB1:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA IND_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA IND_Y";
                     LDA(ADDRESS_MODE_6502_IND_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_Y;
                     ClockCycles = 5;
                     break;
 
                 case 0xB5:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDA Z_PAGE_X";
                     LDA(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -793,35 +793,35 @@ namespace Compukit_UK101_UWP
 
                 // LDX
                 case 0xAE:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX ABSOLUTE";
                     LDX(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0xA6:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX ZERO_PAGE";
                     LDX(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0xA2:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX IMMEDIATE";
                     LDX(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0xBE:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX ABS_Y";
                     LDX(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 4;
                     break;
 
                 case 0xB6:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX Z_PAGE_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDX Z_PAGE_Y";
                     LDX(ADDRESS_MODE_6502_Z_PAGE_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_Y;
                     ClockCycles = 4;
@@ -829,35 +829,35 @@ namespace Compukit_UK101_UWP
 
                 // LDY
                 case 0xAC:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY ABSOLUTE";
                     LDY(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0xA4:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY ZERO_PAGE";
                     LDY(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0xA0:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY IMMEDIATE";
                     LDY(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0xBC:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY ABS_X";
                     LDY(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 4;
                     break;
 
                 case 0xB4:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLDY Z_PAGE_X";
                     LDY(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -865,35 +865,35 @@ namespace Compukit_UK101_UWP
 
                 // LSR
                 case 0x4A:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR ACCUMULATOR";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR ACCUMULATOR";
                     LSR(ADDRESS_MODE_6502_ACCUMULATOR);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ACCUMULATOR;
                     ClockCycles = 2;
                     break;
 
                 case 0x4E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR ABSOLUTE";
                     LSR(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 6;
                     break;
 
                 case 0x46:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR ZERO_PAGE";
                     LSR(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 5;
                     break;
 
                 case 0x5E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR ABS_X";
                     LSR(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 7;
                     break;
 
                 case 0x56:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tLSR Z_PAGE_X";
                     LSR(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 6;
@@ -901,7 +901,7 @@ namespace Compukit_UK101_UWP
 
                 // NOP
                 case 0xEA:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tNOP IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tNOP IMPLIED";
                     NOP(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -909,56 +909,56 @@ namespace Compukit_UK101_UWP
 
                 // ORA
                 case 0x0D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA ABSOLUTE";
                     ORA(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0x05:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA ZERO_PAGE";
                     ORA(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0x09:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA IMMEDIATE";
                     ORA(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0x1D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA ABS_X";
                     ORA(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 4;
                     break;
 
                 case 0x19:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA ABS_Y";
                     ORA(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 4;
                     break;
 
                 case 0x01:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA IND_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA IND_X";
                     ORA(ADDRESS_MODE_6502_IND_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_X;
                     ClockCycles = 6;
                     break;
 
                 case 0x11:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA IND_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA IND_Y";
                     ORA(ADDRESS_MODE_6502_IND_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_Y;
                     ClockCycles = 5;
                     break;
 
                 case 0x15:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tORA Z_PAGE_X";
                     ORA(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -966,7 +966,7 @@ namespace Compukit_UK101_UWP
 
                 // PHA
                 case 0x48:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tPHA IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tPHA IMPLIED";
                     PHA(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 3;
@@ -974,7 +974,7 @@ namespace Compukit_UK101_UWP
 
                 // PHP
                 case 0x08:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tPHP IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tPHP IMPLIED";
                     PHP(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 3;
@@ -982,7 +982,7 @@ namespace Compukit_UK101_UWP
 
                 // PLA
                 case 0x68:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tPLA IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tPLA IMPLIED";
                     PLA(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 4;
@@ -990,7 +990,7 @@ namespace Compukit_UK101_UWP
 
                 // PLP
                 case 0x28:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tPLP IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tPLP IMPLIED";
                     PLP(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 4;
@@ -998,35 +998,35 @@ namespace Compukit_UK101_UWP
 
                 // ROL
                 case 0x2A:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL ACCUMULATOR";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL ACCUMULATOR";
                     ROL(ADDRESS_MODE_6502_ACCUMULATOR);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ACCUMULATOR;
                     ClockCycles = 2;
                     break;
 
                 case 0x2E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL ABSOLUTE";
                     ROL(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 6;
                     break;
 
                 case 0x26:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL ZERO_PAGE";
                     ROL(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 5;
                     break;
 
                 case 0x3E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL ABS_X";
                     ROL(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 7;
                     break;
 
                 case 0x36:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROL Z_PAGE_X";
                     ROL(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 6;
@@ -1034,35 +1034,35 @@ namespace Compukit_UK101_UWP
 
                 // ROR
                 case 0x6A:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR ACCUMULATOR";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR ACCUMULATOR";
                     ROR(ADDRESS_MODE_6502_ACCUMULATOR);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ACCUMULATOR;
                     ClockCycles = 2;
                     break;
 
                 case 0x6E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR ABSOLUTE";
                     ROR(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 6;
                     break;
 
                 case 0x66:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR ZERO_PAGE";
                     ROR(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 5;
                     break;
 
                 case 0x7E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR ABS_X";
                     ROR(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 7;
                     break;
 
                 case 0x76:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tROR Z_PAGE_X";
                     ROR(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 6;
@@ -1070,7 +1070,7 @@ namespace Compukit_UK101_UWP
 
                 // RTI
                 case 0x40:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tRTI IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tRTI IMPLIED";
                     RTI(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 6;
@@ -1078,7 +1078,7 @@ namespace Compukit_UK101_UWP
 
                 // RTS
                 case 0x60:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tRTS IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tRTS IMPLIED";
                     RTS(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 6;
@@ -1086,56 +1086,56 @@ namespace Compukit_UK101_UWP
 
                 // SBC
                 case 0xED:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC ABSOLUTE";
                     SBC(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0xE5:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC ZERO_PAGE";
                     SBC(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 3;
                     break;
 
                 case 0xE9:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC IMMEDIATE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC IMMEDIATE";
                     SBC(ADDRESS_MODE_6502_IMMEDIATE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMMEDIATE;
                     ClockCycles = 2;
                     break;
 
                 case 0xFD:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC ABS_X";
                     SBC(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 4;
                     break;
 
                 case 0xF9:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC ABS_Y";
                     SBC(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 4;
                     break;
 
                 case 0xE1:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC IND_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC IND_X";
                     SBC(ADDRESS_MODE_6502_IND_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_X;
                     ClockCycles = 6;
                     break;
 
                 case 0xF1:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC IND_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC IND_Y";
                     SBC(ADDRESS_MODE_6502_IND_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_Y;
                     ClockCycles = 5;
                     break;
 
                 case 0xF5:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSBC Z_PAGE_X";
                     SBC(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -1143,7 +1143,7 @@ namespace Compukit_UK101_UWP
 
                 // SEC
                 case 0x38:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSEC IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSEC IMPLIED";
                     SEC(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1151,7 +1151,7 @@ namespace Compukit_UK101_UWP
 
                 // SED
                 case 0xF8:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSED IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSED IMPLIED";
                     SED(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1159,7 +1159,7 @@ namespace Compukit_UK101_UWP
 
                 // SEI
                 case 0x78:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSEI IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSEI IMPLIED";
                     SEI(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1167,49 +1167,49 @@ namespace Compukit_UK101_UWP
 
                 // STA
                 case 0x8D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA ABSOLUTE";
                     STA(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0x85:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA ZERO_PAGE";
                     STA(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 2;
                     break;
 
                 case 0x9D:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA ABS_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA ABS_X";
                     STA(ADDRESS_MODE_6502_ABS_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_X;
                     ClockCycles = 5;
                     break;
 
                 case 0x99:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA ABS_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA ABS_Y";
                     STA(ADDRESS_MODE_6502_ABS_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABS_Y;
                     ClockCycles = 5;
                     break;
 
                 case 0x81:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA IND_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA IND_X";
                     STA(ADDRESS_MODE_6502_IND_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_X;
                     ClockCycles = 6;
                     break;
 
                 case 0x91:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA IND_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA IND_Y";
                     STA(ADDRESS_MODE_6502_IND_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IND_Y;
                     ClockCycles = 6;
                     break;
 
                 case 0x95:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTA Z_PAGE_X";
                     STA(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -1217,21 +1217,21 @@ namespace Compukit_UK101_UWP
 
                 // STX
                 case 0x8E:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTX ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTX ABSOLUTE";
                     STX(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0x86:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTX ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTX ZERO_PAGE";
                     STX(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 2;
                     break;
 
                 case 0x96:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTX Z_PAGE_Y";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTX Z_PAGE_Y";
                     STX(ADDRESS_MODE_6502_Z_PAGE_Y);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_Y;
                     ClockCycles = 4;
@@ -1239,21 +1239,21 @@ namespace Compukit_UK101_UWP
 
                 // STY
                 case 0x8C:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTY ABSOLUTE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTY ABSOLUTE";
                     STY(ADDRESS_MODE_6502_ABSOLUTE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ABSOLUTE;
                     ClockCycles = 4;
                     break;
 
                 case 0x84:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTY ZERO_PAGE";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTY ZERO_PAGE";
                     STY(ADDRESS_MODE_6502_ZERO_PAGE);
                     //AddressMode_Debug = ADDRESS_MODE_6502_ZERO_PAGE;
                     ClockCycles = 2;
                     break;
 
                 case 0x94:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTY Z_PAGE_X";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tSTY Z_PAGE_X";
                     STY(ADDRESS_MODE_6502_Z_PAGE_X);
                     //AddressMode_Debug = ADDRESS_MODE_6502_Z_PAGE_X;
                     ClockCycles = 4;
@@ -1261,7 +1261,7 @@ namespace Compukit_UK101_UWP
 
                 // TAX
                 case 0xAA:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTAX IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTAX IMPLIED";
                     TAX(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1269,7 +1269,7 @@ namespace Compukit_UK101_UWP
 
                 // TAY
                 case 0xA8:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTAY IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTAY IMPLIED";
                     TAY(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1277,7 +1277,7 @@ namespace Compukit_UK101_UWP
 
                 // TSX
                 case 0xBA:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTSX IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTSX IMPLIED";
                     TSX(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1285,7 +1285,7 @@ namespace Compukit_UK101_UWP
 
                 // TXA
                 case 0x8A:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTXA IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTXA IMPLIED";
                     TXA(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1293,7 +1293,7 @@ namespace Compukit_UK101_UWP
 
                 // TXS
                 case 0x9A:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTXS IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTXS IMPLIED";
                     TXS(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1301,7 +1301,7 @@ namespace Compukit_UK101_UWP
 
                 // TYA
                 case 0x98:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTYA IMPLIED";
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "\tTYA IMPLIED";
                     TYA(ADDRESS_MODE_6502_IMPLIED);
                     //AddressMode_Debug = ADDRESS_MODE_6502_IMPLIED;
                     ClockCycles = 2;
@@ -1310,8 +1310,8 @@ namespace Compukit_UK101_UWP
                 // If there was no recognizable opcode the processor
                 // wildly runs on:
                 default:
-                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[PC.L / 16] + hexChars[PC.L % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "??? ";
-                    PC.W++;
+                    //if (DebugEnabled) DebugString = "" + hexChars[PC.H / 16] + hexChars[PC.H % 16] + hexChars[(byte)(PC % 256) / 16] + hexChars[(byte)(PC % 256) % 16] + "\t" + hexChars[OpCode / 16] + hexChars[OpCode % 16] + "??? ";
+                    PC++;
                     break;
             }
 
@@ -1572,7 +1572,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void AND(int AddressMode)
@@ -1639,7 +1639,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void ASL(int AddressMode)
@@ -1764,7 +1764,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BCC(int AddressMode)
@@ -1801,31 +1801,30 @@ namespace Compukit_UK101_UWP
             */
 
             // Point out next byte, the branch offset:
-            PC.W++;
+            PC++;
 
             // Test carry flag:
             if (!IsSet(FLAG_6502_CARRY))
             {
                 // Fetch branch offset:
                 MemoryBus.SetAddress(PC);
-                Address tmp = new Address();
-                tmp.H = 0;
-                tmp.L = MemoryBus.Read();
+                byte tmp;
+                tmp = MemoryBus.Read();
 
                 // Prepare branch:
-                if ((tmp.L & 0x80) == 0x00)
+                if ((tmp & 0x80) == 0x00)
                 {
                     PC += tmp;
                 }
                 else
                 {
-                    tmp.L = (byte)(0x00 - tmp.L);
+                    tmp = (byte)(0x00 - tmp);
                     PC -= tmp;
                 }
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BCS(int AddressMode)
@@ -1861,31 +1860,30 @@ namespace Compukit_UK101_UWP
             */
 
             // Point at next byte:
-            PC.W++;
+            PC++;
 
             // Test carry flag:
             if (IsSet(FLAG_6502_CARRY))
             {
                 // Fetch next byte:
                 MemoryBus.SetAddress(PC);
-                Address tmp = new Address();
-                tmp.H = 0;
-                tmp.L = MemoryBus.Read();
+                //Address tmp = new Address();
+                byte tmp = MemoryBus.Read();
 
                 // Prepare branch:
-                if ((tmp.L & 0x80) == 0x00)
+                if ((tmp & 0x80) == 0x00)
                 {
                     PC += tmp;
                 }
                 else
                 {
-                    tmp.L = (byte)(0x00 - tmp.L);
+                    tmp = (byte)(0x00 - tmp);
                     PC -= tmp;
                 }
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BEQ(int AddressMode)
@@ -1921,31 +1919,29 @@ namespace Compukit_UK101_UWP
             */
 
             // Point at next byte:
-            PC.W++;
+            PC++;
 
             // Test zero flag:
             if (IsSet(FLAG_6502_ZERO))
             {
                 // Fetch next byte:
                 MemoryBus.SetAddress(PC);
-                Address tmp = new Address();
-                tmp.H = 0;
-                tmp.L = MemoryBus.Read();
+                byte tmp = MemoryBus.Read();
 
                 // Prepare branch:
-                if ((tmp.L & 0x80) == 0x00)
+                if ((tmp & 0x80) == 0x00)
                 {
                     PC += tmp;
                 }
                 else
                 {
-                    tmp.L = (byte)(0x00 - tmp.L);
+                    tmp = (byte)(0x00 - tmp);
                     PC -= tmp;
                 }
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BIT(int AddressMode)
@@ -2036,7 +2032,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BMI(int AddressMode)
@@ -2074,31 +2070,29 @@ namespace Compukit_UK101_UWP
             */
 
             // Point at next byte:
-            PC.W++;
+            PC++;
 
             // Test minus flag:
             if (IsSet(FLAG_6502_NEGATIVE))
             {
                 // Fetch next byte:
                 MemoryBus.SetAddress(PC);
-                Address tmp = new Address();
-                tmp.H = 0;
-                tmp.L = MemoryBus.Read();
+                byte tmp = MemoryBus.Read();
 
                 // Prepare branch:
-                if ((tmp.L & 0x80) == 0x00)
+                if ((tmp & 0x80) == 0x00)
                 {
                     PC += tmp;
                 }
                 else
                 {
-                    tmp.L = (byte)(0x00 - tmp.L);
+                    tmp = (byte)(0x00 - tmp);
                     PC -= tmp;
                 }
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BNE(int AddressMode)
@@ -2132,31 +2126,29 @@ namespace Compukit_UK101_UWP
             */
 
             // Point at next byte:
-            PC.W++;
+            PC++;
 
             // Test zero flag:
             if (!IsSet(FLAG_6502_ZERO))
             {
                 // Fetch next byte:
                 MemoryBus.SetAddress(PC);
-                Address tmp = new Address();
-                tmp.H = 0;
-                tmp.L = MemoryBus.Read();
+                byte tmp = MemoryBus.Read();
 
                 // Prepare branch:
-                if ((tmp.L & 0x80) == 0x00)
+                if ((tmp & 0x80) == 0x00)
                 {
                     PC += tmp;
                 }
                 else
                 {
-                    tmp.L = (byte)(0x00 - tmp.L);
+                    tmp = (byte)(0x00 - tmp);
                     PC -= tmp;
                 }
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BPL(int AddressMode)
@@ -2191,31 +2183,29 @@ namespace Compukit_UK101_UWP
             */
 
             // Point at next byte:
-            PC.W++;
+            PC++;
 
             // Test minus flag:
             if (!IsSet(FLAG_6502_NEGATIVE))
             {
                 // Fetch next byte:
                 MemoryBus.SetAddress(PC);
-                Address tmp = new Address();
-                tmp.H = 0;
-                tmp.L = MemoryBus.Read();
+                byte tmp = MemoryBus.Read();
 
                 // Prepare branch:
-                if ((tmp.L & 0x80) == 0x00)
+                if ((tmp & 0x80) == 0x00)
                 {
                     PC += tmp;
                 }
                 else
                 {
-                    tmp.L = (byte)(0x00 - tmp.L);
+                    tmp = (byte)(0x00 - tmp);
                     PC -= tmp;
                 }
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BRK(int AddressMode)
@@ -2263,12 +2253,12 @@ namespace Compukit_UK101_UWP
             */
 
             // Move to next instruction:
-            PC.W++;
-            PC.W++;
+            PC++;
+            PC++;
 
             // Push program counter on stack:
-            Push(PC.H);
-            Push(PC.L);
+            Push((byte)(PC / 256));
+            Push((byte)(PC % 256));
 
             // Set the break flag:
             SetFlag(FLAG_6502_BRK_COMMAND);
@@ -2281,13 +2271,13 @@ namespace Compukit_UK101_UWP
 
             // The interrupt vector is located at 0xFFFE - 0xFFFF.
             // Fetch interrupt vector and jump:
-            Address adr = new Address();
-            adr.W = 0xFFFE;
+            //Address adr = new Address();
+            ushort adr = 0xFFFE;
             MemoryBus.SetAddress(adr);
-            PC.L = MemoryBus.Read();
-            adr.W = 0xFFFF;
+            PC = MemoryBus.Read();
+            adr = 0xFFFF;
             MemoryBus.SetAddress(adr);
-            PC.H = MemoryBus.Read();
+            PC += (ushort)(256 * MemoryBus.Read());
         }
 
         public void BVC(int AddressMode)
@@ -2328,31 +2318,29 @@ namespace Compukit_UK101_UWP
             */
 
             // Point at next byte:
-            PC.W++;
+            PC++;
 
             // Test overflow flag:
             if (!IsSet(FLAG_6502_OVERFLOW))
             {
                 // Fetch next byte:
                 MemoryBus.SetAddress(PC);
-                Address tmp = new Address();
-                tmp.H = 0;
-                tmp.L = MemoryBus.Read();
+                byte tmp = MemoryBus.Read();
 
                 // Prepare branch:
-                if ((tmp.L & 0x80) == 0x00)
+                if ((tmp & 0x80) == 0x00)
                 {
                     PC += tmp;
                 }
                 else
                 {
-                    tmp.L = (byte)(0x00 - tmp.L);
+                    tmp = (byte)(0x00 - tmp);
                     PC -= tmp;
                 }
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void BVS(int AddressMode)
@@ -2393,31 +2381,29 @@ namespace Compukit_UK101_UWP
             */
 
             // Point at next byte:
-            PC.W++;
+            PC++;
 
             // Test overflow flag:
             if (IsSet(FLAG_6502_OVERFLOW))
             {
                 // Fetch next byte:
                 MemoryBus.SetAddress(PC);
-                Address tmp = new Address();
-                tmp.H = 0;
-                tmp.L = MemoryBus.Read();
+                byte tmp = MemoryBus.Read();
 
                 // Prepare branch:
-                if ((tmp.L & 0x80) == 0x00)
+                if ((tmp & 0x80) == 0x00)
                 {
                     PC += tmp;
                 }
                 else
                 {
-                    tmp.L = (byte)(0x00 - tmp.L);
+                    tmp = (byte)(0x00 - tmp);
                     PC -= tmp;
                 }
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void CLC(int AddressMode)
@@ -2446,7 +2432,7 @@ namespace Compukit_UK101_UWP
             ResetFlag(FLAG_6502_CARRY);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void CLD(int AddressMode)
@@ -2474,7 +2460,7 @@ namespace Compukit_UK101_UWP
             ResetFlag(FLAG_6502_DECIMAL_MODE);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void CLI(int AddressMode)
@@ -2506,7 +2492,7 @@ namespace Compukit_UK101_UWP
             ResetFlag(FLAG_6502_IRQ_DISABLE);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void CLV(int AddressMode)
@@ -2538,7 +2524,7 @@ namespace Compukit_UK101_UWP
             ResetFlag(FLAG_6502_OVERFLOW);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void CMP(int AddressMode)
@@ -2658,7 +2644,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void CPX(int AddressMode)
@@ -2729,7 +2715,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void CPY(int AddressMode)
@@ -2800,7 +2786,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void DEC(int AddressMode)
@@ -2856,7 +2842,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void DEX(int AddressMode)
@@ -2901,7 +2887,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void DEY(int AddressMode)
@@ -2946,7 +2932,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void EOR(int AddressMode)
@@ -3002,7 +2988,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void INC(int AddressMode)
@@ -3058,7 +3044,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void INX(int AddressMode)
@@ -3102,7 +3088,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void INY(int AddressMode)
@@ -3146,7 +3132,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void JMP(int AddressMode)
@@ -3164,7 +3150,7 @@ namespace Compukit_UK101_UWP
             // Get effective address in AddressInEffect:
             FetchAddress(AddressMode);
 
-            PC = new Address(AddressInEffect);
+            PC = AddressInEffect;
         }
 
         public void JSR(int AddressMode)
@@ -3193,14 +3179,14 @@ namespace Compukit_UK101_UWP
             /*
                 // Since we are to push last address onto the
                 // stack, we must increment PC first:
-                PC.W++;
+                PC++;
             */
             // Push program counter on stack:
-            Push(PC.H);
-            Push(PC.L);
+            Push((byte)(PC / 256));
+            Push((byte)(PC % 256));
 
             // Set new PC:
-            PC = new Address(AddressInEffect);
+            PC = AddressInEffect;
         }
 
         public void LDA(int AddressMode)
@@ -3245,7 +3231,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void LDX(int AddressMode)
@@ -3290,7 +3276,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void LDY(int AddressMode)
@@ -3335,7 +3321,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void LSR(int AddressMode)
@@ -3436,7 +3422,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void NOP(int AddressMode)
@@ -3454,7 +3440,7 @@ namespace Compukit_UK101_UWP
             */
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void ORA(int AddressMode)
@@ -3510,7 +3496,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void PHA(int AddressMode)
@@ -3530,7 +3516,7 @@ namespace Compukit_UK101_UWP
             Push(A);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void PHP(int AddressMode)
@@ -3553,7 +3539,7 @@ namespace Compukit_UK101_UWP
             Push(P);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void PLA(int AddressMode)
@@ -3597,7 +3583,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void PLP(int AddressMode)
@@ -3623,7 +3609,7 @@ namespace Compukit_UK101_UWP
             P = Pull();
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void ROL(int AddressMode)
@@ -3750,7 +3736,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void ROR(int AddressMode)
@@ -3876,7 +3862,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void RTI(int AddressMode)
@@ -3925,8 +3911,8 @@ namespace Compukit_UK101_UWP
             P = Pull();
 
             // Fetch program counter from stack:
-            PC.L = Pull();
-            PC.H = Pull();
+            PC = Pull();
+            PC = (ushort)(256 * Pull());
         }
 
         public void RTS(int AddressMode)
@@ -3949,9 +3935,9 @@ namespace Compukit_UK101_UWP
             */
 
             // Fetch program counter from stack:
-            PC.L = Pull();
-            PC.H = Pull();
-            PC.W++;
+            PC = Pull();
+            PC += (ushort)(256 * Pull());
+            PC++;
         }
 
         public void SBC(int AddressMode)
@@ -4158,7 +4144,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void SEC(int AddressMode)
@@ -4177,7 +4163,7 @@ namespace Compukit_UK101_UWP
             SetFlag(FLAG_6502_CARRY);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void SED(int AddressMode)
@@ -4195,7 +4181,7 @@ namespace Compukit_UK101_UWP
             SetFlag(FLAG_6502_DECIMAL_MODE);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void SEI(int AddressMode)
@@ -4216,7 +4202,7 @@ namespace Compukit_UK101_UWP
             SetFlag(FLAG_6502_IRQ_DISABLE);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void STA(int AddressMode)
@@ -4239,7 +4225,7 @@ namespace Compukit_UK101_UWP
             MemoryBus.Write(A);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void STX(int AddressMode)
@@ -4262,7 +4248,7 @@ namespace Compukit_UK101_UWP
             MemoryBus.Write(X);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void STY(int AddressMode)
@@ -4285,7 +4271,7 @@ namespace Compukit_UK101_UWP
             MemoryBus.Write(Y);
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void TAX(int AddressMode)
@@ -4332,7 +4318,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void TAY(int AddressMode)
@@ -4379,7 +4365,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void TSX(int AddressMode)
@@ -4424,7 +4410,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void TXA(int AddressMode)
@@ -4471,7 +4457,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void TXS(int AddressMode)
@@ -4497,7 +4483,7 @@ namespace Compukit_UK101_UWP
             S = X;
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         public void TYA(int AddressMode)
@@ -4544,7 +4530,7 @@ namespace Compukit_UK101_UWP
             }
 
             // Move to next instruction:
-            PC.W++;
+            PC++;
         }
 
         //////////////////////////////////////////////////////////////////////////
@@ -4593,12 +4579,12 @@ namespace Compukit_UK101_UWP
 
         public void Fetch_ABSOLUTE()
         {//
-            PC.W++;
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.L = MemoryBus.Read();
-            PC.W++;
+            AddressInEffect = MemoryBus.Read();
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.H = MemoryBus.Read();
+            AddressInEffect += (ushort)(256 * MemoryBus.Read());
 
             //if (DebugEnabled) CreateDebugBytes(2);
             //if (DebugEnabled) SetDebugByte(0, AddressInEffect.L);
@@ -4607,10 +4593,10 @@ namespace Compukit_UK101_UWP
 
         public void Fetch_ZERO_PAGE()
         {//
-            PC.W++;
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.L = MemoryBus.Read();
-            AddressInEffect.H = 0x00;
+            AddressInEffect = MemoryBus.Read();
+            //AddressInEffect.H = 0x00;
 
             //if (DebugEnabled) CreateDebugBytes(1);
             //if (DebugEnabled) SetDebugByte(0, AddressInEffect.L);
@@ -4618,8 +4604,8 @@ namespace Compukit_UK101_UWP
 
         public void Fetch_IMMEDIATE()
         {//
-            PC.W++;
-            AddressInEffect = new Address(PC);
+            PC++;
+            AddressInEffect = PC;
 
             //if (DebugEnabled) CreateDebugBytes(1);
             //if (DebugEnabled) SetDebugByte(0, MemoryBus.Read());
@@ -4627,13 +4613,13 @@ namespace Compukit_UK101_UWP
 
         public void Fetch_ABS_X()
         {//
-            PC.W++;
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.L = MemoryBus.Read();
-            PC.W++;
+            AddressInEffect = MemoryBus.Read();
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.H = MemoryBus.Read();
-            AddressInEffect.W += X;
+            AddressInEffect += (ushort)(256 * MemoryBus.Read());
+            AddressInEffect += X;
             //	AddressInEffect.L += X;
 
             //if (DebugEnabled) CreateDebugBytes(2);
@@ -4643,13 +4629,13 @@ namespace Compukit_UK101_UWP
 
         public void Fetch_ABS_Y()
         {//
-            PC.W++;
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.L = MemoryBus.Read();
-            PC.W++;
+            AddressInEffect = MemoryBus.Read();
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.H = MemoryBus.Read();
-            AddressInEffect.W += Y;
+            AddressInEffect += (ushort)(256 * MemoryBus.Read());
+            AddressInEffect += Y;
             //	AddressInEffect.L += Y;
 
             //if (DebugEnabled) CreateDebugBytes(2);
@@ -4662,11 +4648,11 @@ namespace Compukit_UK101_UWP
          // Fetch address in zero page, as indicated by immediate 
          // byte, and store in a temporary address, incremented by
          // the offset in X, with wrap-around:
-            Address temp = new Address();
-            PC.W++;
+            //Address temp = new Address();
+            PC++;
             MemoryBus.SetAddress(PC);
-            temp.L = (byte)(X + MemoryBus.Read());
-            temp.H = 0x00;
+            ushort temp = (ushort)((X + MemoryBus.Read()) & 0x00ff);
+            //temp.H = 0x00;
 
             //if (DebugEnabled) CreateDebugBytes(1);
             //if (DebugEnabled) SetDebugByte(0, MemoryBus.Read());
@@ -4674,21 +4660,22 @@ namespace Compukit_UK101_UWP
             // Fetch address in effect from the data in zero page as
             // appointed by the temporary address:
             MemoryBus.SetAddress(temp);
-            AddressInEffect.L = MemoryBus.Read();
-            temp.L++;
+            AddressInEffect = MemoryBus.Read();
+            temp++;
+            temp &= 0x00ff;
             MemoryBus.SetAddress(temp);
-            AddressInEffect.H = MemoryBus.Read();
+            AddressInEffect += (ushort)(256 * MemoryBus.Read());
         }
 
         public void Fetch_IND_Y()
         {//
          // Fetch address in zero page, as indicated by immediate 
          // byte, and store in a temporary address:
-            Address temp = new Address();
-            PC.W++;
+            //Address temp = new Address();
+            PC++;
             MemoryBus.SetAddress(PC);
-            temp.L = MemoryBus.Read();
-            temp.H = 0x00;
+            ushort temp = MemoryBus.Read();
+            //temp.H = 0x00;
 
             //if (DebugEnabled) CreateDebugBytes(1);
             //if (DebugEnabled) SetDebugByte(0, MemoryBus.Read());
@@ -4696,28 +4683,30 @@ namespace Compukit_UK101_UWP
             // Fetch address in effect from the data in zero page as
             // appointed by the temporary address:
             MemoryBus.SetAddress(temp);
-            AddressInEffect.L = MemoryBus.Read();
-            temp.L++;
+            AddressInEffect = MemoryBus.Read();
+            temp++;
+			temp &= 0x00ff;
             MemoryBus.SetAddress(temp);
-            AddressInEffect.H = MemoryBus.Read();
+            AddressInEffect += (ushort)(256 * MemoryBus.Read());
 
             // Add index Y to form the actual address:
-            AddressInEffect.W += Y;
+            AddressInEffect += Y;
             // Or, if wrap-around is to be in effect:
             //	AddressInEffect.L  += Y;
         }
 
         public void Fetch_Z_PAGE_X()
         {//
-            PC.W++;
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.L = (byte)(X + MemoryBus.Read());
-            AddressInEffect.H = 0x00;
+            AddressInEffect = (byte)(X + MemoryBus.Read());
+			//AddressInEffect &= 0x00ff;
+            //AddressInEffect.H = 0x00;
         }
 
         public void Fetch_RELATIVE()
         {//
-            PC.W++;
+            PC++;
             int temp;
             MemoryBus.SetAddress(PC);
             temp = MemoryBus.Read();
@@ -4729,7 +4718,7 @@ namespace Compukit_UK101_UWP
             {
                 temp -= 256;
             }
-            AddressInEffect.W = (UInt16)(PC.W + temp);
+            AddressInEffect = (ushort)(PC + temp);
         }
 
         public void Fetch_INDIRECT()
@@ -4738,15 +4727,15 @@ namespace Compukit_UK101_UWP
          There’s hardware bug on the 6502 that causes jump indirect, with an operand which ends in $FF (such
          as $11FF), to bomb; the new high program counter value is taken incorrectly from $1100, not the correct $1200.
          */
-            Address temp = new Address();
+            //Address temp = new Address();
 
             // Fetch address of indirect address stored:
-            PC.W++;
+            PC++;
             MemoryBus.SetAddress(PC);
-            temp.L = MemoryBus.Read();
-            PC.W++;
+            ushort temp = MemoryBus.Read();
+            PC++;
             MemoryBus.SetAddress(PC);
-            temp.H = MemoryBus.Read();
+            temp += (ushort)(256 * MemoryBus.Read());
             MemoryBus.SetAddress(temp);
 
             //if (DebugEnabled) CreateDebugBytes(2);
@@ -4754,20 +4743,22 @@ namespace Compukit_UK101_UWP
             //if (DebugEnabled) SetDebugByte(0, temp.H);
 
             // Fetch address at that location:
-            AddressInEffect.L = MemoryBus.Read();
-            temp.W++;
-            if (temp.L == 0x00) temp.H--; // The 'bug' described 17 lines above.
+            AddressInEffect = MemoryBus.Read();
+            temp++;
+            //if (temp.L == 0x00) temp.H--; // The 'bug' described 17 lines above.
+            if ((temp % 256) == 0x00) temp -= 256; // The 'bug' described 17 lines above.
             MemoryBus.SetAddress(temp);
-            AddressInEffect.H = MemoryBus.Read();
+            AddressInEffect += (ushort)(256 * MemoryBus.Read());
         }
 
         public void Fetch_Z_PAGE_Y()
         {//
-            PC.W++;
+            PC++;
             MemoryBus.SetAddress(PC);
-            AddressInEffect.H = 0x00;
-            //AddressInEffect.W = (UInt16)(Y + MemoryBus.Read());
-            AddressInEffect.L = (byte)(Y + MemoryBus.Read());
+            //AddressInEffect.H = 0x00;
+            //AddressInEffect.W = (ushort)(Y + MemoryBus.Read());
+            AddressInEffect = (byte)(Y + MemoryBus.Read());
+			//AddressInEffect &= 0x00ff;
             //if (DebugEnabled) CreateDebugBytes(1);
             //if (DebugEnabled) SetDebugByte(0, MemoryBus.Read());
         }
@@ -4891,9 +4882,9 @@ namespace Compukit_UK101_UWP
         public void Push(byte Byte)
         {
             // Obtain address to current stack location:
-            Address adr = new Address();
-            adr.L = S;
-            adr.H = 0x01; // Stack always in page 1!
+            //Address adr = new Address();
+            ushort adr = (ushort)(S | 0x0100);
+            //adr.H = 0x01; // Stack always in page 1!
 
             // Write databyte to stack:
             MemoryBus.SetAddress(adr);
@@ -4910,9 +4901,9 @@ namespace Compukit_UK101_UWP
             S += 1;
 
             // Obtain address to current stack location:
-            Address adr = new Address();
-            adr.L = S;
-            adr.H = 0x01; // Stack always in page 1!
+            //Address adr = new Address();
+            ushort adr = (ushort)(S | 0x0100);
+            //adr.H = 0x01; // Stack always in page 1!
 
             // Fetch data from stack:
             MemoryBus.SetAddress(adr);

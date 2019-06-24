@@ -24,8 +24,8 @@ namespace Compukit_UK101_UWP
             if (newSize > 0 && newSize <= 0x8000)
             {
                 RAMSize = newSize;
-                StartsAt.W = 0x0000;
-                EndsAt.W = (UInt16)(newSize - 1);
+                StartsAt = 0x0000;
+                EndsAt = (UInt16)(newSize - 1);
                 pData = new byte[newSize];
                 result = true;
             }
@@ -33,14 +33,21 @@ namespace Compukit_UK101_UWP
             return result;
         }
 
-        public byte Read()
+        public override byte Read()
         {
-            return pData[Address.W];
+            if (Address < RAMSize)
+            {
+                return pData[Address];
+            }
+            else
+            {
+                return (byte)(Address & 0x00ff);
+            }
         }
 
-        public void Write(byte InData)
+        public override void Write(byte InData)
         {
-            pData[Address.W] = InData;
+            pData[Address] = InData;
         }
     }
 }
